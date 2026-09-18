@@ -1,0 +1,9 @@
+# Preserve the authoritative sample byte-for-byte across Windows/Linux checkouts.
+BUP_CSE_FEST_2026_Preli_Public_Sample_Cases.json -text
+*.pdf binary
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+*.lock text eol=lf
+Dockerfile text eol=lf

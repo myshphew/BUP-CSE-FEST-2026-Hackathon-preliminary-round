@@ -1,0 +1,35 @@
+name: Verify GridWise
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.lock -r requirements-dev.txt
+      - run: python -m pytest -q
+      - run: python -m scripts.evaluate_samples --offline
+      - run: docker build -t gridwise:ci .
+      - name: Container solver and sample verification
+        run: docker run --rm gridwise:ci python -m scripts.evaluate_samples --offline
+      - name: Container readiness smoke test
+        shell: bash
+        run: |
+          # Placeholder checks configuration readiness only; never makes a model call.
+          docker run -d --name gridwise-ci -p 8000:8000 -e OPENAI_API_KEY=ci-placeholder-not-a-real-key gridwise:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/health; then exit 0; fi
+            sleep 1
+          done
+          docker logs gridwise-ci
+          exit 1
+      - name: Clean up container
+        if: always()
+        run: docker rm -f gridwise-ci || true
