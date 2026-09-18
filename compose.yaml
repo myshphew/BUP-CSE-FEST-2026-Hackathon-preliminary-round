@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    image: bup-cse-preliminary-round:1.0.0
+    ports:
+      - "${HOST_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      PORT: "8000"
+    restart: unless-stopped
+    init: true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

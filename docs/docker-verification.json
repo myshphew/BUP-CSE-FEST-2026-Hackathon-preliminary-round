@@ -1,0 +1,58 @@
+{
+  "verified_at": "2026-09-18T15:25:59.809431+00:00",
+  "image_tag": "bup-cse-preliminary-round:1.0.0",
+  "local_image_id": "sha256:9f67b7af48d4580248da3ef40f9d140e1ee686b391e600734b4cb349706d3360",
+  "platform": "linux/amd64",
+  "image_size_bytes": 294171484,
+  "runtime_uid": 10001,
+  "env_file_in_image": false,
+  "test_fixtures_in_image": false,
+  "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+  "linux_pytest_passed": 165,
+  "linux_pytest_warnings": 2,
+  "container_offline_samples_passed": 10,
+  "live_http": {
+    "mode": "http_full_pipeline",
+    "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+    "passed": 30,
+    "total": 30,
+    "p95_seconds": 3.667017,
+    "max_seconds": 5.024275,
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "none",
+    "application_cache_size": 0,
+    "live_llm_evaluated": true,
+    "verified_at": "2026-09-18T15:25:59.809431+00:00",
+    "runtime": "Docker Desktop Linux container over host HTTP",
+    "image_id": "sha256:9f67b7af48d4580248da3ef40f9d140e1ee686b391e600734b4cb349706d3360"
+  },
+  "invalid_request_checks": {
+    "malformed_json": 400,
+    "missing_hour": 400,
+    "unknown_field": 400
+  },
+  "health_status": 200,
+  "docker_health": "healthy",
+  "dependency_check": "No broken requirements found",
+  "registry_image_published": false,
+  "public_endpoint_deployed": false,
+  "github_ci": {
+    "commit": "c9f0040ea8491677cb950706f500baa7b61885df",
+    "conclusion": "success",
+    "url": "https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35361197350"
+  },
+  "image_archive_load_verified": true,
+  "compose_configuration_valid": true,
+  "workflow_actionlint_passed": true,
+  "missing_key_checks": {
+    "health_status": 500,
+    "optimize_status": 500,
+    "error_code": "service_not_ready"
+  },
+  "normal_compose_profile": {
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "none",
+    "cache_size": 128,
+    "local_base_url": "http://127.0.0.1:8000"
+  }
+}

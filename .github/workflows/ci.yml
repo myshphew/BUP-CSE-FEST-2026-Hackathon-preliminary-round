@@ -24,7 +24,7 @@ jobs:
         run: |
           # Placeholder checks configuration readiness only; never makes a model call.
           docker run -d --name gridwise-ci -p 8000:8000 -e OPENAI_API_KEY=ci-placeholder-not-a-real-key gridwise:ci
-          for attempt in $(seq 1 30); do
+          for _attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:8000/health; then exit 0; fi
             sleep 1
           done

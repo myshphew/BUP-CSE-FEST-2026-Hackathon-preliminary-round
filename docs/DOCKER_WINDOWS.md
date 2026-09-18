@@ -1,12 +1,14 @@
 # Docker Desktop startup on this Windows machine
 
-Docker Desktop is installed, but its backend currently reports:
+**Resolved on 2026-09-18:** Docker Desktop 4.91.0 now reports a working Docker Engine 29.8.0 Linux/amd64 server. Image build, Linux tests, live OpenAI HTTP requests, and Compose startup have passed. No further Windows feature changes are needed on this machine. See [verification evidence](VERIFICATION.md).
+
+The following instructions document the earlier failure and are retained for troubleshooting another installation. The earlier backend reported:
 
 ```text
 engine linux/wsl failed to start: checking preconditions: Virtual Machine Platform not enabled
 ```
 
-The coding session is not running with an administrator token. Windows feature activation and the required restart need a local administrator; the application code cannot fix this prerequisite. No registry credentials or API key are needed for this step.
+If this specific error occurs, Windows feature activation and the required restart need a local administrator; the application code cannot fix this prerequisite. No registry credentials or API key are needed for that step.
 
 1. Save your work. Open **PowerShell as Administrator**.
 2. Enable the feature identified by Docker:

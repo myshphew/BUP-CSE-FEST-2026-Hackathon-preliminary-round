@@ -1,27 +1,40 @@
-# Final submission and demo
+# Final submission checklist
 
-The implementation is prepared locally. Actual accounts, model credentials, public deployment, registry publication, and video recording are still needed. Fill in real values only after verifying them; no published endpoint or image is implied by the templates.
+The implementation, Linux Docker verification, real OpenAI benchmark, and local video are complete. Public hosting, registry publication, and organizer submission still require external account access. Do not submit localhost or the local image tag as public references.
 
-## Complete these steps
+## Prepared and verified locally
 
-1. Configure `OPENAI_API_KEY` securely and run `main:app` via `python run.py`.
-2. Run all ten samples through the HTTP evaluator and inspect interpretation, replay, and cost results. Run a cold benchmark with `INTERPRETATION_CACHE_SIZE=0`; record actual provider p95 and failures. Evaluate paraphrases without hard-coding them into the interpreter.
-3. On a Docker-enabled host, build the image, run the offline container samples, start it with runtime secrets, and run full HTTP samples. Docker Desktop is now installed locally, but its backend reports that Virtual Machine Platform is disabled. Follow [the administrator/restart steps](DOCKER_WINDOWS.md) first; container checks remain incomplete.
-4. Push to an authenticated registry and record the real image tag and digest. Pull/run it from a clean environment using the exact documented command. Ensure judges can pull it without private-registry credentials.
-5. Deploy that image as one service with port 8000 or platform-provided `PORT`, server-side secrets, and a public base URL. Verify health and optimization from another network. Keep the service running throughout evaluation.
-6. Follow the guide's repository policy: repository created after question reveal, private during the event, public after the submission deadline. Current remote visibility/timing has not been verified or changed by this implementation.
-7. Record the video below, keep it under three minutes, and make it organizer-accessible. Submit the public base URL, source repository, README/configuration, exact pullable image reference, and video link/upload.
+- 165 tests pass inside Linux Docker. All ten official costs match.
+- Real OpenAI requests through the container: 30/30 pass with cache 0; p95 3.667 seconds.
+- Compose runs a healthy API at `http://127.0.0.1:8000`, using Terra/none and cache 128.
+- `output/submission/gridwise-solution.mp4`: 2:44 narrated architecture video, 1080p H.264/AAC; visually checked and fully decoded. Uses recorded local results and a synthetic Microsoft David voice.
+- `output/submission/gridwise-1.0.0.tar`: exported tested Docker image; load with `docker load -i output/submission/gridwise-1.0.0.tar`.
+- `output/submission/gridwise-source.zip`: source, tests, official samples, and documentation, including these local delivery changes; archive integrity checked and `.env` excluded.
+- `output/submission/SHA256SUMS.txt` and `submission-manifest.json`: checksums and accurate publication status.
+- `output/submission/sample-01-request.json`, `sample-01-live-response.json`, and `health.json`: official input and actual local service responses.
+- Manual GHCR publishing workflow, Compose configuration, README, rubric mapping, reports, and [deployment runbook](DEPLOYMENT.md).
 
-## Three-minute video outline
+Generated files under `output/` are ignored by Git and have not been uploaded. The image archive does not replace the registry requirement.
+
+## External steps still required
+
+1. **Check repository visibility against the event deadline.** The repository is public. Its owner must keep it private during the event and make it public after the deadline. The connected account cannot change visibility. Question-reveal/deadline times are unknown, so timing compliance is unresolved.
+2. **Publish the fallback image.** Use the prepared GHCR workflow or your authenticated registry. Record the actual tag/digest and verify anonymous pull/run. See [exact instructions](DEPLOYMENT.md).
+3. **Deploy the API.** Select a hosting account, deploy the Dockerfile/image, and inject the OpenAI key through the host's secret manager. Use the tested model/cache settings.
+4. **Verify the public service.** From outside this computer, test both endpoints and all official inputs. Measure uncached hosted p95, then restore cache 128 and restart/redeploy. Keep the service available throughout judging.
+5. **Upload the video.** Submit the prepared MP4 or an organizer-accessible link. Review the [transcript](video/TRANSCRIPT.md) and ensure the team can explain the implementation.
+6. **Submit real references.** Provide the public base URL, repository, README/configuration, pullable image reference, and video. Never put a secret in a public submission field.
+
+## Video contents
 
 | Time | Show and explain |
 |---|---|
-| 0:00–0:25 | The 24-hour campus problem: demand, solar, tariffs, battery, and operational notes; validity before cost |
-| 0:25–0:55 | The pipeline diagram; the configured OpenAI model turns notes into six supported directive types; disclose the actual deployed model and reasoning setting |
-| 0:55–1:25 | `validator.py`: note mappings, ordered hours, remaining-solar fractions, capacity bounds, prompt/data separation, safe failure |
-| 1:25–1:55 | `optimizer.py`: signed battery flow, cost objective, hard constraints, overlapping rules, and end-of-day neutrality |
-| 1:55–2:25 | `schedule_validator.py` and actual test output; show sample optimal cost agreement and independent replay |
-| 2:25–2:50 | Run `/health` and a real `/optimize-energy` request; show the verified Docker command and public endpoint |
-| 2:50–3:00 | State the verified model, latency results, and reproducibility artifacts; do not present mock results as live-model results |
+| 0:00–0:21 | The 24-hour campus problem, inputs, objective, and validity requirements |
+| 0:21–0:43 | OpenAI interpretation → strict guardrails → CBC → independent replay |
+| 0:43–1:07 | Actual SAMPLE-01 interpretation: solar factor 0.25 at hours 12 and 13, plus no-op |
+| 1:07–1:33 | LP formulation, battery neutrality, physical constraints, and overlap rules |
+| 1:33–1:57 | Linux tests, official costs, real OpenAI verification, and limitations |
+| 1:57–2:20 | Verified Docker command and recorded local health/optimization results |
+| 2:20–2:44 | Model/cache configuration, observed latency, and deployment requirements |
 
-This is a recording outline, not a completed video. The live demonstration should use the deployed production app with genuine model interpretation.
+Times are rounded to the nearest second. The video makes no claim that a public deployment already exists. Reproduction and narration details are in [video/README.md](video/README.md). It carries no base points but is the first tie-breaker in the guide.

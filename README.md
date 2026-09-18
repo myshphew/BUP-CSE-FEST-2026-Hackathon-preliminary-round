@@ -1,8 +1,8 @@
 # bup-cse-preliminary-round — GridWise
 
-A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization Challenge**. OpenAI GPT-6 Astra interprets operator notes, deterministic guardrails validate the result, PuLP/CBC minimizes 24-hour grid cost, and an independent validator replays the final schedule before it is returned.
+A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization Challenge**. The configured OpenAI model interprets operator notes, deterministic guardrails validate the result, PuLP/CBC minimizes 24-hour grid cost, and an independent validator replays the final schedule before it is returned.
 
-**Verification status:** all 10 official sample optimal costs match. Live OpenAI comparison passed 30/30 requests each for Astra, Sol, and Terra with application caching disabled. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. The local test suite passes. Public hosting and Docker execution remain unverified; Docker Desktop is installed but a Windows prerequisite is disabled. See [verification evidence](docs/VERIFICATION.md) and [measured model performance](docs/PERFORMANCE.md). These results are not a claimed hidden-judge score.
+**Verification status:** 165 tests passed inside Linux Docker; all 10 official sample optimal costs match. Real OpenAI requests through the container passed **30/30 with caching disabled, p95 3.667 seconds**. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. A narrated 2:44 solution video and an exported Docker image are prepared locally. Public hosting and registry publication still need account selection/access. See [verification evidence](docs/VERIFICATION.md), [measured model performance](docs/PERFORMANCE.md), and [remaining deployment steps](docs/DEPLOYMENT.md). These results are not a claimed hidden-judge score.
 
 ## Official sources and API permission
 
@@ -161,7 +161,17 @@ Tests also include isolated invalid-input mutations, overlapping directives, zer
 
 ## Docker and deployment
 
-The image uses Python 3.12, pinned runtime dependencies, an unprivileged user, a health check, and port 8000. Secrets are excluded from the build context. If Docker Desktop is installed but reports that Virtual Machine Platform is disabled, follow [the Windows prerequisite fix](docs/DOCKER_WINDOWS.md). On a Docker-enabled machine:
+The verified Linux/amd64 image uses Python 3.12, pinned runtime dependencies, an unprivileged user (UID 10001), a health check, and port 8000. Secrets are excluded from the build context. Docker Desktop's earlier Windows prerequisite issue is resolved; the [Windows troubleshooting notes](docs/DOCKER_WINDOWS.md) remain available if needed. With `.env` configured, the restartable local service can be managed using:
+
+```bash
+docker compose up -d --build --wait
+docker compose ps
+curl http://127.0.0.1:8000/health
+docker compose logs --tail 30
+docker compose down
+```
+
+Compose uses the model/cache values in `.env`, bounded log rotation, and `restart: unless-stopped`. Docker Desktop must itself be running. After changing `.env`, use `docker compose up -d --force-recreate --wait`. If port 8000 is occupied, set `HOST_PORT=8001` in the shell before starting Compose and use that port in local requests. Direct Docker commands are also supported:
 
 ```bash
 docker build -t bup-cse-preliminary-round:1.0.0 .
@@ -180,9 +190,11 @@ docker pull ghcr.io/YOUR_NAMESPACE/bup-cse-preliminary-round:1.0.0
 docker run --rm -p 8000:8000 --env-file .env ghcr.io/YOUR_NAMESPACE/bup-cse-preliminary-round:1.0.0
 ```
 
-Deploy the same image on a publicly reachable platform with `OPENAI_API_KEY` supplied through its secret manager. Keep both judge endpoints accessible without a login, VPN, or manual action. Verify both endpoints **from outside the development machine** and keep the service and image available throughout evaluation. The included CI workflow performs offline tests and container smoke checks when run on GitHub; it has not been executed remotely as part of the local verification.
+The optional **Publish tested Docker image** GitHub Actions workflow publishes to GHCR using GitHub's job token after tests, offline container verification, and a readiness check pass. It records the exact digest and verifies an authenticated registry pull. The package owner must separately enable and verify anonymous pulls for judges. See [the publication runbook](docs/DEPLOYMENT.md); this workflow has been prepared, but has not been pushed or run.
 
-The guide also requires the repository visibility/timing rules and a maximum three-minute solution video. See [submission steps and video outline](docs/SUBMISSION.md). No image has been pushed and no public service has been deployed from this workspace.
+Deploy the same image on a publicly reachable platform with `OPENAI_API_KEY` supplied through its secret manager. Keep both judge endpoints accessible without a login, VPN, or manual action. Verify both endpoints **from outside the development machine** and keep the service and image available throughout evaluation. The existing [GitHub CI run for commit c9f0040 passed](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35361197350).
+
+The guide also requires repository visibility/timing rules and a maximum three-minute solution video. See [the submission checklist](docs/SUBMISSION.md) and [video transcript/reproduction notes](docs/video/README.md). The local video is `output/submission/gridwise-solution.mp4`; the image archive is `output/submission/gridwise-1.0.0.tar`, with SHA-256 checksums beside them. These generated artifacts are intentionally outside Git. No image has been published and no public service has been deployed from this workspace.
 
 ## Dependencies, attribution, and limitations
 
@@ -192,5 +204,5 @@ Python; FastAPI/Starlette; Uvicorn; Pydantic; the OpenAI Python SDK and Response
 - Deterministic guardrails verify shapes and numeric/physical consistency. They cannot prove that a valid-looking interpretation matches the natural-language intent. That requires live language evaluation against expected semantics.
 - LLM behavior and provider latency are not deterministic. The scheduling calculation is deterministic for the same validated inputs and pinned runtime. Equivalent optimal schedules can differ across solver versions/platforms.
 - Missing keys, inaccessible models, insufficient quota, or invalid model outputs fail safely; there is no heuristic interpreter fallback. A correct but slow/unavailable provider can still lose rubric points.
-- Live-model accuracy and local p95 have been measured for the documented cases; unseen-language accuracy and deployed p95 still require ongoing evaluation. Docker/Linux execution, public deployment, registry publication, and the recorded video remain submission steps.
+- Live-model accuracy, Docker/Linux execution, and local p95 have been verified for the documented cases. Public deployment, registry publication, video submission, unseen-language accuracy, and deployed p95 still require verification or external action.
 - The installed test dependencies emit two upstream deprecation warnings; the test suite still passes. They concern Starlette's HTTPX test client and AnyIO's portal alias.

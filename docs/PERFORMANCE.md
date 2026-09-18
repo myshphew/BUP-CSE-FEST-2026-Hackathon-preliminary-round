@@ -63,6 +63,12 @@ These commands use the locally configured secret and make paid requests. They do
 
 The final command starts an isolated temporary Uvicorn instance, forces its cache to zero, performs real HTTP verification, writes its model/cache metadata, and stops that temporary process. Keep `INTERPRETATION_CACHE_SIZE=128` in the normal service. If benchmarking an already-running server instead, set its cache to zero and restart it, then restore 128 and restart when finished.
 
+## Verified Docker performance
+
+Docker Engine 29.8.0 now works. A clean Linux/amd64 image build succeeded, and all **165 tests** passed inside that image. A separate real HTTP benchmark through Docker Desktop used Terra/none with application cache **0**: **30/30 passed, p95 3.667017 seconds, maximum 5.024275 seconds**. The complete report is `output/docker-live-benchmark.json`; the versioned summary is [docker-verification.json](docker-verification.json).
+
+The current service runs through Compose at `http://127.0.0.1:8000` with cache **128**. A new SAMPLE-01 request took 2.384 seconds; its cached repeat took 0.007 seconds, both with the correct interpretation and cost. These timings are observations, not a guarantee. The container p95 remains within the rubric's five-second target even though one of the 30 requests exceeded five seconds.
+
 ## Remaining external action
 
-Docker Desktop is installed but cannot start because Windows Virtual Machine Platform is disabled. This session has no administrator token. Follow [the Windows setup steps](DOCKER_WINDOWS.md), restart Windows, and start Docker Desktop. After that, container build/run verification and image preparation can continue. Public hosting and registry publication still need a chosen provider/account and verified access.
+Public hosting and registry publication still need a chosen provider/account and verified access. [The deployment runbook](DEPLOYMENT.md) and a manual GHCR publishing workflow are prepared. The current GitHub repository is public; an owner must ensure its visibility matches the event deadline requirements. The available GitHub account has push permission, but no repository administration permission.

@@ -74,5 +74,20 @@
     "reasoning_effort": "none",
     "application_cache_size": 128
   },
-  "limits": "Finite local tests, not proof of hidden-case accuracy or future/deployed latency. In-process comparison excludes a local TCP hop."
+  "limits": "Finite local tests, not proof of hidden-case accuracy or future/deployed latency. In-process comparison excludes a local TCP hop.",
+  "docker_http": {
+    "mode": "http_full_pipeline",
+    "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+    "passed": 30,
+    "total": 30,
+    "p95_seconds": 3.667017,
+    "max_seconds": 5.024275,
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "none",
+    "application_cache_size": 0,
+    "live_llm_evaluated": true,
+    "verified_at": "2026-09-18T15:25:59.809431+00:00",
+    "runtime": "Docker Desktop Linux container over host HTTP",
+    "image_id": "sha256:9f67b7af48d4580248da3ef40f9d140e1ee686b391e600734b4cb349706d3360"
+  }
 }

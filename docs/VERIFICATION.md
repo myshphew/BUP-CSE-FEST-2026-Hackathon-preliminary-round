@@ -24,6 +24,18 @@ Date: 2026-09-18. Host: Windows x64. Runtime: Python 3.12.14 in `.venv`, created
 | Selected Terra/none profile over real HTTP | 30/30 passed with cache disabled; p95 3.005 seconds; temporary Uvicorn server stopped afterward |
 | Running local production API | Restarted on port 8000 with Terra/none and cache 128; health 200; correct first request about 2.679 seconds and cached repeat about 0.013 seconds |
 | Cache concurrency and cancellation | Identical concurrent misses share one call; one canceled caller does not cancel another; disabled-cache calls stay independent; all covered by tests |
+| Docker build | Successful Linux/amd64 build on Docker Engine 29.8.0; pinned dependencies installed; bundled CBC works |
+| Linux container tests | 165 passed in 2.03 seconds; two upstream deprecation warnings; tests mounted read-only into a disposable container |
+| Container offline samples | 10/10 optimal costs and independent replay passed |
+| Container real OpenAI HTTP benchmark | Terra/none, cache 0: 30/30 passed; p95 3.667017 seconds; maximum 5.024275 seconds |
+| Image contents and runtime | UID 10001; no `/app/.env`; no test fixtures; official sample SHA-256 preserved; `pip check` passed |
+| Container invalid inputs and missing secret | Malformed JSON, missing hour, and extra field return 400; missing-key health/optimization both return safe 500 `service_not_ready` |
+| Docker Compose | Configuration validated; detached startup with `--wait` passed; current service healthy at port 8000, Terra/none, cache 128 |
+| Current Compose real request/cache | SAMPLE-01 correct; first request 2.384 seconds; cached repeat 0.007 seconds |
+| Remote CI | Existing commit c9f0040 run verified successful; [GitHub Actions evidence](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35361197350) |
+| Submission video | Narrated 1080p H.264/AAC MP4, 2:44; frames visually inspected; full audio/video decode passed; uses recorded local results |
+| Local image archive | Exported Docker image to `output/submission/gridwise-1.0.0.tar`; checksums and submission manifest generated |
+| Archive and workflow checks | Docker archive loaded successfully; source ZIP integrity passed and excludes `.env`; both GitHub workflows pass actionlint/ShellCheck; Compose configuration validates |
 | Public deployment / registry mutation | Not performed |
 
 The offline and fixture HTTP tests supply organizer expected interpretations; **those rows do not evaluate real model understanding**. The additional live-comparison and language-check rows use genuine OpenAI calls with the configured local key. No key is included in reports. The live comparison runs the production FastAPI pipeline in-process; verify the final profile over TCP as documented in [performance results](PERFORMANCE.md). Test-only fixture modules are excluded from Docker.
@@ -48,8 +60,9 @@ Every computed schedule also passed independent replay under the official interp
 ## Not yet verified
 
 - OpenAI access and the documented live tests have passed, but finite public/supplemental tests cannot establish perfect accuracy on hidden notes or guarantee future provider latency/quota.
-- Docker CLI is installed, but the daemon cannot start because Virtual Machine Platform is disabled. This session has no administrator token. Linux container build, solver compatibility, and pull/run readiness remain unverified; see [Windows setup](DOCKER_WINDOWS.md).
-- CI has not been run remotely as part of this verification. The user has pushed the earlier implementation; the new performance changes have not been pushed or deployed by this session.
-- A public base URL, published pullable image, independent fresh-machine check, and recorded three-minute video are not yet available.
+- Public hosting, anonymous registry pulls, and an independent external-network request are not yet verified. The local archive is not a substitute for the required pullable registry reference.
+- The existing CI passed, but the new manual publishing workflow and documentation/Compose changes are local and have not been pushed. The publishing workflow has not run.
+- The 2:44 video is created locally but still needs organizer-accessible upload/submission.
+- GitHub metadata reports the repository is currently public, created at 2026-09-18T13:13:45Z. The question-reveal/deadline times were not supplied, so event timing compliance cannot be determined. The connected account cannot change repository visibility.
 
 Reproduce locally with the README commands. Generated detailed reports are in ignored `output/`; they are evidence from individual runs, not official judge results. Update this file after live/container/deployment verification rather than treating planned checks as completed.

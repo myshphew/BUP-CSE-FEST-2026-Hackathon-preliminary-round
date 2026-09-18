@@ -4,12 +4,12 @@ Source: supplied Participant Guide, sections 06–10, especially pages 7–8. Al
 
 | Category | Points | Implementation and evidence | Remaining verification |
 |---|---:|---|---|
-| LLM directive interpretation | 25 | Real Responses API path; exact schemas; relevance/type/hours/value instructions; percentage and paraphrase handling in the prompt; SDK transport tests | Live model accuracy on all official notes, additional paraphrases, and unseen notes |
+| LLM directive interpretation | 25 | Real Responses API path; strict schemas; Astra/Sol/Terra each passed 30/30 official live requests; Astra/Terra each passed 15/15 supplemental language checks | Unseen-note accuracy |
 | Directive application and constraint correctness | 25 | All five operational directives; deterministic overlap rules; energy/battery equations; independent replay; public-case and mutation tests | Hidden-case evaluation |
-| Optimization quality | 10 | Exact lossless-battery LP; proven optimal CBC status; all 10 public optimal costs matched; 12 independent small-instance DP comparisons | End-to-end correctness under actual model interpretations |
+| Optimization quality | 10 | Exact lossless-battery LP; proven optimal CBC status; all 10 public optimal costs matched, including 30/30 real container requests; 12 independent small-instance DP comparisons | Hidden-case evaluation |
 | API contract and schema | 10 | Exact endpoints/fields; strict validation; ordered note mappings and plans; scenario echo; 400/422/500 controlled errors; HTTP tests | External deployed endpoint checks |
-| Performance and reliability | 10 | Readiness startup solve; async model client; bounded deadlines and concurrency; safe failures; successful-response cache; repeated/concurrent tests | Actual provider p95, funded quota, account limits, deployment failure rate |
-| Deployment and Docker fallback | 10 | Dockerfile, non-root execution, pinned dependencies, secret exclusion, health check, port binding, CI container checks, documented pull/run template | Docker build/run on available host, exact published image tag/digest, external availability |
+| Performance and reliability | 10 | Bounded deadlines/concurrency, safe failures, validated cache; real uncached Docker HTTP 30/30 passed, p95 3.667s, max 5.024s | Hosted p95, continuing quota/account availability, deployment failure rate |
+| Deployment and Docker fallback | 10 | Verified Linux build/run, 165 container tests, non-root execution, no baked secrets, health check, Compose startup, exported image, passing remote CI | Exact published image tag/digest, anonymous pull, external hosted availability |
 | Documentation and local reproducibility | 10 | README quickstart, model/provider/config, official sample commands, mathematical explanation, limitations, secret handling, credited tools | Independent fresh-machine reproduction and final real registry/base URL details |
 
 The first category splits into five points each for relevance, directive type, affected hours, numeric values/shape, and paraphrase robustness. Validation catches invalid structure and ranges; it does not replace language accuracy testing.
