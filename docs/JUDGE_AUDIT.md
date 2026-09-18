@@ -2,6 +2,8 @@
 
 Audit date: 2026-09-18. This is a provisional evidence review, not an official judge score. The main problem (14 pages) was read first, followed by the participant guide/rubric (11 pages); rubric pages 7 and 8 were also inspected visually. Hidden test data is unavailable.
 
+The subsequently supplied text excerpts (guide sections 07–11 and main problem sections 01–12) were checked against this audit and the implementation. They agree with the covered requirements. Both the pasted text and the visually checked original rubric page 7 truncate the last zero-optimum sentence after `quality_ratio`; do not invent its missing text. The printed ratio formula and explicit both-zero rule remain readable. The expanded README now contains every documentation scoring item directly, exact directive/API fields, operational thresholds and both immutable image commands. Its source quickstart selects the candidate branch explicitly. Hosting suggestions are recorded separately in [FREE_HOSTING.md](FREE_HOSTING.md); none has been provisioned.
+
 ## Verdict
 
 The required LLM-to-validator-to-optimizer-to-replay architecture is present. Every official cost equals the organizer optimum. A cheaper valid electricity bill cannot be obtained on those same inputs under the same constraints. The new 1.0.1 candidate preserves the primary cost objective and minimizes peak import among cost-optimal schedules. This improves an operational metric without falsely claiming extra cost-score points.
@@ -40,7 +42,7 @@ The strongest unresolved risks concern availability and submission access, not t
 | Environment / model / provider documentation | 2 | Names and meanings documented; no secret values. Astra/low baseline and tested Terra profiles distinguished. |
 | Public sample procedure / expected result | 2 | Unmodified authoritative JSON, protected SHA-256, extraction and HTTP evaluator; SAMPLE-01 expected cost 38,365 BDT. |
 | LLM / guardrail / optimizer explanation | 1 | Documented module boundaries, LP equations, interpretation provenance and independent replay. |
-| Docker pull / run instructions | 1 | Exact tested image command is required in the README itself; publishing templates alone are insufficient. README now includes exact verified 1.0.0 pull/run/sample commands, with the separate candidate command linked. |
+| Docker pull / run instructions | 1 | README includes exact verified 1.0.0 and 1.0.1 immutable pull/run commands plus health and real-sample verification; no registry placeholders are needed. |
 | Dependencies / limitations / secrets | 1 | Pinned/credited libraries, API environment secret, AI assistance attribution, semantic uncertainty and free-host limitations documented. |
 
 The seven category ceilings are 25 + 25 + 10 + 10 + 10 + 10 + 10 = 100. Reporting “100/100” from public tests would be unjustified. Deployment/access conditions must be resolved even if all code tests pass.
@@ -119,3 +121,7 @@ Selected Terra/low additionally passed 9/9 explicitly labeled semantic-edge unit
 The current public 1.0.0 service was also checked after a long interval without agent traffic: `/health` returned HTTP 200 in 22.120 seconds. Platform spin-down was not independently confirmed, so this is an observed delayed health request, not a guaranteed cold-start bound. It does not remove Render Free's documented suspension risk.
 
 After that delayed health check, the existing public 1.0.0 service passed a fresh official SAMPLE-01 request in 6.869 seconds with the correct 38,365 BDT cost. This one request is reported separately from the earlier 30-request hosted benchmark; its latency is not a new representative p95 estimate.
+
+## README and pasted-requirements follow-up
+
+After updating the documentation, the existing Windows environment again passed 243 tests (two upstream warnings), dependency checks and all ten official offline cases. The documented local health, extraction, curl POST and sample-evaluator commands succeeded; SAMPLE-01 retained the 38,365 BDT bill and 175 kWh peak. The running service had cache enabled, so these smoke checks are not new uncached language/latency evidence. All 51 checked local documentation links/anchors resolved; fences and a key-pattern scan passed; the official sample SHA-256 remained unchanged. No runtime code, hosting settings or monitoring services were changed by this follow-up.
