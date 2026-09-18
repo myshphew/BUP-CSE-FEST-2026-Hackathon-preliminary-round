@@ -94,7 +94,7 @@ def main():
                 entry["elapsed_seconds"] = round(time.perf_counter() - started, 6)
                 results.append(entry)
                 print(f"{'PASS' if entry['passed'] else 'FAIL'} {case['id']} "
-                      f"{entry['elapsed_seconds']:.3f}s cost={entry.get('cost_bdt', 'unavailable')}")
+                      f"{entry['elapsed_seconds']:.3f}s cost={entry.get('cost_bdt', 'unavailable')}", flush=True)
     times = sorted(x["elapsed_seconds"] for x in results)
     report = {
         "mode": "offline_math_only" if args.offline else "http_full_pipeline",

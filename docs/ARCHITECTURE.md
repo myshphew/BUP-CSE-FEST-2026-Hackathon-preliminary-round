@@ -56,7 +56,9 @@ The public evaluation runner supplies organizer ground truth separately. Thus a 
 
 ## Language and safety boundary
 
-Structured Outputs restrict the model to a nested union of exact directive schemas. Application validation is still required: provider responses, JSON, and parsed objects are untrusted. Every note must appear once in its original order, with consistent applies/no-op semantics, sorted unique integer hours, and valid finite numbers. Unknown fields cannot modify demand, tariffs, battery settings, or execute code.
+Structured Outputs restrict the model to a nested union of exact directive schemas. To reduce generation time, the provider emits only note indexes, directive types, and structured adjustments under `directives`. `validator.py` validates this extraction, derives `applies` from the type, and writes a short deterministic explanation of the validated values. It then applies the original public-schema validation. There is no semantic phrase parser or repair of missing/reordered notes in this conversion.
+
+Application validation is still required: provider responses, JSON, and parsed objects are untrusted. Every note must appear once in its original order, with consistent applies/no-op semantics, sorted unique integer hours, and valid finite numbers. Unknown fields cannot modify demand, tariffs, battery settings, or execute code.
 
 Instructions are separate from the user-role JSON carrying notes. No tools or code execution are available to the model. Missing credentials, refusal, incomplete output, unsupported directives, timeout, and provider errors return fixed controlled errors. The API never converts these into irrelevant notes. Unexpected application exceptions are caught before the server can print a sensitive traceback.
 
@@ -64,11 +66,11 @@ This boundary does not provide a mathematical guarantee of semantic accuracy. A 
 
 ## Performance choices
 
-- One batched interpretation call for 1–3 notes, with `low` reasoning and a short output.
+- One batched interpretation call for 1–3 notes, with `low` reasoning for Astra and a compact semantic output. Sol/Terra can also be evaluated with `none` reasoning; the service rejects that unsupported setting for Astra.
 - No model-generated summary or schedule.
 - Shared asynchronous client, no SDK retries, a 20-second model deadline, and a 28-second application deadline including queue wait.
 - Eight concurrent pipelines per worker by default; the solver runs off the event loop.
-- At most 128 successful validated interpretation responses cached in memory. Cache hits are revalidated; changed battery context invalidates the key. No failures or sample fixtures are cached.
+- At most 128 successful validated interpretation responses cached in memory. Cache hits are revalidated; changed battery context invalidates the key. No failures or sample fixtures are cached. Concurrent identical misses share one model call with cancellation isolation. When the cache is disabled, every request calls the model independently for honest uncached measurements.
 - CBC has a three-second solve budget. Canceling an async request does not forcibly terminate an already-running worker thread; its solver has its own bounded execution time.
 
 These choices limit processing overhead. They do not establish the rubric's p95 target for a hosted model or overloaded service; measure the actual deployed path with the cache disabled for cold-request latency.

@@ -13,6 +13,17 @@ from models import Scenario
 
 
 def response_body(text, status="completed", refusal=False):
+    # Most fixtures use the public response shape for readability. The provider
+    # wire format intentionally omits redundant fields and all free-text output.
+    try:
+        value = json.loads(text)
+        if isinstance(value, dict) and "directive_interpretation" in value:
+            text = json.dumps({"directives": [
+                {k: v for k, v in d.items() if k not in {"applies", "explanation"}}
+                for d in value["directive_interpretation"]
+            ]})
+    except ValueError:
+        pass
     content = [{"type": "refusal", "refusal": "Cannot comply"}] if refusal else [
         {"type": "output_text", "text": text, "annotations": []}]
     return {"id": "resp_test", "object": "response", "created_at": 1,
@@ -54,6 +65,7 @@ def test_real_sdk_request_contract_and_validated_cache(case, scenario):
     assert request["reasoning"] == {"effort": "low"}
     assert request["instructions"] == SYSTEM_PROMPT
     assert request["text"]["format"]["strict"] is True
+    assert request["text"]["format"]["schema"]["required"] == ["directives"]
     assert "tools" not in request
     payload = json.loads(request["input"][0]["content"])
     assert payload == {"operator_notes": scenario.operator_notes, "battery": scenario.battery.model_dump()}
@@ -140,6 +152,48 @@ def test_cache_is_bounded(case, scenario):
             changed.battery.capacity_kwh += 1
             await interpreter.interpret(changed)
             assert len(interpreter.cache) == 1
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("cache_size,expected_calls", [(128, 1), (0, 2)])
+def test_concurrent_identical_requests_share_only_when_cache_enabled(case, scenario, cache_size, expected_calls):
+    calls = []
+    async def handler(request):
+        calls.append(request)
+        await asyncio.sleep(0.02)
+        return httpx.Response(200, json=response_body(json.dumps({"directive_interpretation": case["expected_output"]["directive_interpretation"]})))
+    async def run():
+        interpreter = make_interpreter(handler, cache_size=cache_size)
+        try:
+            results = await asyncio.gather(interpreter.interpret(scenario), interpreter.interpret(scenario))
+            assert results[0] == results[1]
+            assert len(calls) == expected_calls
+            assert not interpreter.inflight
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+
+
+def test_cancelled_request_does_not_cancel_shared_model_call(case, scenario):
+    async def run():
+        started, release = asyncio.Event(), asyncio.Event()
+        async def handler(request):
+            started.set()
+            await release.wait()
+            return httpx.Response(200, json=response_body(json.dumps({"directive_interpretation": case["expected_output"]["directive_interpretation"]})))
+        interpreter = make_interpreter(handler)
+        try:
+            first = asyncio.create_task(interpreter.interpret(scenario))
+            await started.wait()
+            second = asyncio.create_task(interpreter.interpret(scenario))
+            await asyncio.sleep(0)
+            first.cancel()
+            with pytest.raises(asyncio.CancelledError): await first
+            release.set()
+            assert await second
+            assert interpreter.cache
         finally:
             await interpreter.close()
     asyncio.run(run())

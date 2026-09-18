@@ -123,6 +123,49 @@ class Interpretation(StrictModel):
     directive_interpretation: Annotated[list[Directive], Field(min_length=1, max_length=3)]
 
 
+# The provider emits only semantic information. Redundant applies/explanation
+# fields are generated from these validated directives by deterministic code.
+class ExtractedBase(StrictModel):
+    note_index: Annotated[int, Field(ge=0, le=2)]
+
+
+class ExtractedSolar(ExtractedBase):
+    directive_type: Literal["solar_reduction"]
+    structured_adjustment: SolarAdjustment
+
+
+class ExtractedReserve(ExtractedBase):
+    directive_type: Literal["minimum_battery_reserve"]
+    structured_adjustment: ReserveAdjustment
+
+
+class ExtractedNoCharge(ExtractedBase):
+    directive_type: Literal["no_charge_window"]
+    structured_adjustment: Window
+
+
+class ExtractedNoDischarge(ExtractedBase):
+    directive_type: Literal["no_discharge_window"]
+    structured_adjustment: Window
+
+
+class ExtractedGrid(ExtractedBase):
+    directive_type: Literal["max_grid_window"]
+    structured_adjustment: GridAdjustment
+
+
+class ExtractedNoOp(ExtractedBase):
+    directive_type: Literal["no_op"]
+    structured_adjustment: None
+
+
+class Extraction(StrictModel):
+    directives: Annotated[list[Union[
+        ExtractedSolar, ExtractedReserve, ExtractedNoCharge,
+        ExtractedNoDischarge, ExtractedGrid, ExtractedNoOp,
+    ]], Field(min_length=1, max_length=3)]
+
+
 class PlanHour(StrictModel):
     hour: HourIndex
     grid_kwh: NonNegative

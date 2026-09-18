@@ -22,7 +22,8 @@ class Settings:
     def __post_init__(self):
         if not (
             self.model.strip()
-            and self.reasoning_effort in {"low", "medium", "high", "xhigh", "max"}
+            and self.reasoning_effort in {"none", "low", "medium", "high", "xhigh", "max"}
+            and not (self.model.startswith("gpt-6-astra") and self.reasoning_effort == "none")
             and 0 < self.openai_timeout < self.request_timeout < 30
             and 0 < self.solver_timeout < self.request_timeout
             and 256 <= self.max_output_tokens <= 16384

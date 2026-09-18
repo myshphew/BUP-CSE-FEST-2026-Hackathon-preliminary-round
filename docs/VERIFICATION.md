@@ -12,15 +12,21 @@ Date: 2026-09-18. Host: Windows x64. Runtime: Python 3.12.14 in `.venv`, created
 | Dependency installation | Installed successfully into isolated Python 3.12 environment |
 | `pip check` | No broken requirements found |
 | CBC availability | Bundled executable ran startup LP and all test optimization problems |
-| `python -m pytest -q` | 150 passed at this verification stage; two upstream dependency deprecation warnings |
+| `python -m pytest -q` | 165 passed after latency/cache changes; two upstream dependency deprecation warnings |
 | Official offline runner | 10/10 passed; all optimal costs match exactly; one run p95 0.023 seconds |
 | Independent optimum oracle | 12 integer-input unit variants agree with a separate dynamic-programming implementation |
 | Real production Uvicorn, missing key | `/health` and valid `/optimize-energy` safely return HTTP 500 `service_not_ready`; malformed JSON returns 400 |
 | Real Uvicorn with test-only interpretation injection | `/health` returns 200; 30/30 official requests pass across three repetitions; one run p95 approximately 0.015 seconds |
 | OpenAI SDK integration | Request serialization, valid output, cache behavior, refusal, incomplete/malformed output, 401/404/429/5xx, timeout, and prompt/data separation tested with HTTPX transport interception |
+| User's original real HTTP benchmark | 30/30 passed on Astra/low; uncached p95 5.970179 seconds, max 6.815103 seconds; saved report inspected locally |
+| Live model comparison after compact extraction | Astra/low 30/30, p95 4.950s; Sol/none 30/30, p95 3.779s; Terra/none 30/30, p95 3.592s; all application caches disabled |
+| Supplemental live language checks | Astra/low and Terra/none each passed 15/15: ten paraphrases plus five appended instruction-injection variants; separate from the official JSON |
+| Selected Terra/none profile over real HTTP | 30/30 passed with cache disabled; p95 3.005 seconds; temporary Uvicorn server stopped afterward |
+| Running local production API | Restarted on port 8000 with Terra/none and cache 128; health 200; correct first request about 2.679 seconds and cached repeat about 0.013 seconds |
+| Cache concurrency and cancellation | Identical concurrent misses share one call; one canceled caller does not cancel another; disabled-cache calls stay independent; all covered by tests |
 | Public deployment / registry mutation | Not performed |
 
-The successful offline and fixture HTTP tests supply organizer expected interpretations; **they do not evaluate real model understanding**. The provider mock is intercepting the real SDK transport, not calling OpenAI. Test-only fixture modules are excluded from Docker.
+The offline and fixture HTTP tests supply organizer expected interpretations; **those rows do not evaluate real model understanding**. The additional live-comparison and language-check rows use genuine OpenAI calls with the configured local key. No key is included in reports. The live comparison runs the production FastAPI pipeline in-process; verify the final profile over TCP as documented in [performance results](PERFORMANCE.md). Test-only fixture modules are excluded from Docker.
 
 ## Public optimal costs
 
@@ -41,9 +47,9 @@ Every computed schedule also passed independent replay under the official interp
 
 ## Not yet verified
 
-- No `OPENAI_API_KEY` was configured: account/model access, live extraction accuracy, provider quota, and end-to-end p95 remain untested.
-- No Docker CLI/daemon was installed: the Dockerfile and CI commands are prepared, but Linux container build, solver compatibility, and pull/run readiness have not been executed locally.
-- CI has not been run remotely; source changes have not been pushed or deployed.
+- OpenAI access and the documented live tests have passed, but finite public/supplemental tests cannot establish perfect accuracy on hidden notes or guarantee future provider latency/quota.
+- Docker CLI is installed, but the daemon cannot start because Virtual Machine Platform is disabled. This session has no administrator token. Linux container build, solver compatibility, and pull/run readiness remain unverified; see [Windows setup](DOCKER_WINDOWS.md).
+- CI has not been run remotely as part of this verification. The user has pushed the earlier implementation; the new performance changes have not been pushed or deployed by this session.
 - A public base URL, published pullable image, independent fresh-machine check, and recorded three-minute video are not yet available.
 
 Reproduce locally with the README commands. Generated detailed reports are in ignored `output/`; they are evidence from individual runs, not official judge results. Update this file after live/container/deployment verification rather than treating planned checks as completed.

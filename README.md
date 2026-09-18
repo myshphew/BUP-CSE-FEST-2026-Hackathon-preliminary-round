@@ -2,13 +2,15 @@
 
 A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization Challenge**. OpenAI GPT-6 Astra interprets operator notes, deterministic guardrails validate the result, PuLP/CBC minimizes 24-hour grid cost, and an independent validator replays the final schedule before it is returned.
 
-**Verification status:** all 10 official sample optimal costs match when organizer interpretations are supplied. The local test suite and real HTTP smoke tests pass. Live OpenAI interpretation, hosted availability, and Docker execution still need verification: this development environment has no API key or Docker installation. See [verification evidence](docs/VERIFICATION.md). These results are not a claimed hidden-judge score.
+**Verification status:** all 10 official sample optimal costs match. Live OpenAI comparison passed 30/30 requests each for Astra, Sol, and Terra with application caching disabled. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. The local test suite passes. Public hosting and Docker execution remain unverified; Docker Desktop is installed but a Windows prerequisite is disabled. See [verification evidence](docs/VERIFICATION.md) and [measured model performance](docs/PERFORMANCE.md). These results are not a claimed hidden-judge score.
 
 ## Official sources and API permission
 
 The [main problem statement](docs/reference/main_prblm-1.pdf) defines behavior and schemas. The [participant guide and rubric](docs/reference/BUP_CSE_FEST_2026_Participant_Guide__Evaluation_Rubric_GridWise_LLM.pdf) defines scoring, deployment, and submission. The guide, section 04, page 5 explicitly permits **external model APIs or local models**, so OpenAI is allowed. It requires the language model to produce the operator-note interpretation used by the optimizer; phrase matching alone or an AI-written summary is insufficient.
 
 The default model is `gpt-6-astra`, using the OpenAI **Responses API with Structured Outputs**, supported by the [official model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra) and [Structured Outputs guide](https://developers.openai.com/api/docs/guides/structured-outputs). Your account must have access, funded quota, and adequate rate limits during judging.
+
+The benchmark-selected **lower-latency profile** is `OPENAI_MODEL=gpt-5.6-terra` with `OPENAI_REASONING_EFFORT=none`. Set both variables together to use it. The original Astra/low default remains available as the documented baseline. This profile change affects language interpretation only; optimization and all validators are unchanged.
 
 The root [official sample pack](BUP_CSE_FEST_2026_Preli_Public_Sample_Cases.json) is a byte-for-byte copy of the supplied organizer file, with 10 cases under `cases`. Each contains `input`, `expected_output`, and supporting metadata. Its SHA-256 is:
 
@@ -77,8 +79,8 @@ On Windows use `curl.exe` if PowerShell aliases `curl`. The extraction command c
 ## Where the LLM is needed, step by step
 
 1. `main.py` accepts and strictly validates the scenario: 24 distinct hours, 1–3 non-empty notes, finite non-negative numeric values, and consistent battery bounds.
-2. `interpreter.py` sends all notes and battery reference values in **one** OpenAI request. It extracts the directive type, applicable hours, values, relevance, and a short explanation. Percentage reserves can use the supplied battery capacity. Notes are user data, never system instructions. The model has no tools, credentials in its prompt, or execution path.
-3. `validator.py` revalidates the untrusted JSON against exact schemas and scenario-dependent bounds. It rejects unknown types/fields, invalid hours, duplicate or missing note mappings, incorrect `applies` semantics, non-finite numbers, and reserves above capacity.
+2. `interpreter.py` sends all notes and battery reference values in **one** OpenAI request. It extracts only note indexes, directive types, affected hours, and values. Percentage reserves can use the supplied battery capacity. Notes are user data, never system instructions. The model has no tools, credentials in its prompt, or execution path.
+3. `validator.py` validates this compact untrusted extraction, derives `applies` and short explanations deterministically, then revalidates the exact public response shape and scenario-dependent bounds. It rejects unknown types/fields, invalid hours, duplicate or missing note mappings, incorrect `applies` semantics, non-finite numbers, and reserves above capacity. Generating redundant fields in Python reduces model output tokens without removing any semantic checks.
 4. `constraints.py` combines overlapping instructions deterministically: multiply solar factors, maximize reserves, minimize grid caps, and zero prohibited charge/discharge limits.
 5. `optimizer.py` builds and solves the linear program with CBC. **All schedules, costs, battery states, and grid totals come from deterministic code.** No LLM call is made here.
 6. `schedule_validator.py` independently rebuilds the directive effects and replays each hour. It verifies energy balance, solar usage, battery transitions and bounds, rates, windows, grid caps, final neutrality, and recomputed totals.
@@ -113,7 +115,7 @@ Interactive schema documentation is available at `/docs`. Absolute verification 
 |---|---|---|
 | `OPENAI_API_KEY` | required | Secret for the hosted API; never committed |
 | `OPENAI_MODEL` | `gpt-6-astra` | Documented production model; any override needs its own compatibility and accuracy evaluation |
-| `OPENAI_REASONING_EFFORT` | `low` | Minimize interpretation latency; supported values: low, medium, high, xhigh, max |
+| `OPENAI_REASONING_EFFORT` | `low` | Astra: low, medium, high, xhigh, max. Sol/Terra also support `none`; Astra with `none` is rejected locally |
 | `OPENAI_TIMEOUT_SECONDS` | `20` | Hard wall-clock deadline around the model call |
 | `OPENAI_MAX_OUTPUT_TOKENS` | `2048` | Budget for the short structured response, including reasoning |
 | `REQUEST_TIMEOUT_SECONDS` | `28` | Request processing deadline, including semaphore queue time; must be below 30 |
@@ -122,7 +124,9 @@ Interactive schema documentation is available at `/docs`. Absolute verification 
 | `INTERPRETATION_CACHE_SIZE` | `128` | Bounded cache of successful validated model responses; `0` disables it |
 | `PORT` | `8000` | Port used by `python run.py` and Docker |
 
-`.env` is loaded without overriding existing environment variables. Responses API uses `store=false` and SDK retries are disabled to keep failure latency bounded. Invalid outputs and provider failures are never cached. Cache keys include the exact notes, battery context, prompt, and model; every cache hit is validated again. It is an in-memory cache populated only by actual successful model responses, not a public-case lookup.
+`.env` is loaded without overriding existing environment variables. Responses API uses `store=false` and SDK retries are disabled to keep failure latency bounded. Invalid outputs and provider failures are never cached. Cache keys include the exact notes, battery context, prompt, model, and reasoning effort; every cache hit is validated again. Simultaneous identical cache misses share one model call; one client's cancellation does not cancel another's shared request. It is an in-memory cache populated only by actual successful model responses, not a public-case lookup.
+
+Use `INTERPRETATION_CACHE_SIZE=128` in normal operation and `0` for uncached latency measurements. Restart the service after editing `.env`; an already-running process retains its startup settings. Caching accelerates repeated notes with identical battery context, but does not make the first unseen note faster.
 
 ## Testing and performance
 
@@ -143,11 +147,21 @@ python -m scripts.evaluate_samples --url http://127.0.0.1:8000 --repeat 3 --outp
 
 The runner checks interpretation semantics, replays schedules under **organizer ground truth**, compares recalculated cost, and reports nearest-rank p95. Free-text explanations and exact optimal action sequences are not compared. The guide requires every request within 30 seconds and awards full latency credit at p95 <= 5 seconds. Local solver/mock timings do not establish hosted-model p95. Benchmark quota/rate limits and paraphrase accuracy before submitting.
 
+Compare the configured API account's real model behavior without changing `.env` or restarting your existing server:
+
+```bash
+python -m scripts.benchmark_models --repeat 3 --output output/model-comparison.json
+python -m scripts.benchmark_models --candidate gpt-6-astra:low --candidate gpt-5.6-terra:none --language-checks --repeat 1 --output output/language-checks.json
+python -m scripts.verify_live_http --candidate gpt-5.6-terra:none --repeat 3 --output output/terra-http-benchmark.json
+```
+
+These commands make paid OpenAI calls with application caching forced off. The first two run the production FastAPI pipeline in-process. The default comparison tests Astra/low, Sol/none, and Terra/none in rotating order against the unchanged official pack. The second command uses explicitly labeled supplemental paraphrases and instruction-injection variants of those cases; it never changes the official JSON and is not used by production. The final command launches an isolated temporary Uvicorn server and verifies real HTTP latency, then stops it; it does not disturb your running server or edit `.env`. Results and the model decision are documented in [performance verification](docs/PERFORMANCE.md).
+
 Tests also include isolated invalid-input mutations, overlapping directives, zero capacity/rates/tariffs, surplus solar, fractional values, infeasibility, independent dynamic-programming optimality checks, model refusal/timeouts/rate limits, prompt/data separation, corrupted schedules, deterministic repeat solves, and concurrent requests. Unit variants are explicitly test-only and never alter the official sample pack.
 
 ## Docker and deployment
 
-The image uses Python 3.12, pinned runtime dependencies, an unprivileged user, a health check, and port 8000. Secrets are excluded from the build context. On a Docker-enabled machine:
+The image uses Python 3.12, pinned runtime dependencies, an unprivileged user, a health check, and port 8000. Secrets are excluded from the build context. If Docker Desktop is installed but reports that Virtual Machine Platform is disabled, follow [the Windows prerequisite fix](docs/DOCKER_WINDOWS.md). On a Docker-enabled machine:
 
 ```bash
 docker build -t bup-cse-preliminary-round:1.0.0 .
@@ -178,5 +192,5 @@ Python; FastAPI/Starlette; Uvicorn; Pydantic; the OpenAI Python SDK and Response
 - Deterministic guardrails verify shapes and numeric/physical consistency. They cannot prove that a valid-looking interpretation matches the natural-language intent. That requires live language evaluation against expected semantics.
 - LLM behavior and provider latency are not deterministic. The scheduling calculation is deterministic for the same validated inputs and pinned runtime. Equivalent optimal schedules can differ across solver versions/platforms.
 - Missing keys, inaccessible models, insufficient quota, or invalid model outputs fail safely; there is no heuristic interpreter fallback. A correct but slow/unavailable provider can still lose rubric points.
-- Docker/Linux execution, live-model accuracy, real p95, public deployment, registry publication, and the recorded video remain external verification/submission steps.
+- Live-model accuracy and local p95 have been measured for the documented cases; unseen-language accuracy and deployed p95 still require ongoing evaluation. Docker/Linux execution, public deployment, registry publication, and the recorded video remain submission steps.
 - The installed test dependencies emit two upstream deprecation warnings; the test suite still passes. They concern Starlette's HTTPX test client and AnyIO's portal alias.

@@ -1,0 +1,78 @@
+{
+  "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+  "baseline_http": {
+    "mode": "http_full_pipeline",
+    "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+    "passed": 30,
+    "total": 30,
+    "p95_seconds": 5.970179,
+    "max_seconds": 6.815103
+  },
+  "model_comparison": {
+    "mode": "live_openai_through_in_process_production_api",
+    "application_cache_size": 0,
+    "started_at": "2026-09-18T15:01:15.536728+00:00",
+    "completed_at": "2026-09-18T15:05:22.610412+00:00",
+    "candidates": {
+      "gpt-6-astra:low": {
+        "passed": 30,
+        "total": 30,
+        "p50_seconds": 3.0885165,
+        "p95_seconds": 4.95017,
+        "max_seconds": 5.111634
+      },
+      "gpt-5.6-sol:none": {
+        "passed": 30,
+        "total": 30,
+        "p50_seconds": 2.6543795,
+        "p95_seconds": 3.779127,
+        "max_seconds": 5.271568
+      },
+      "gpt-5.6-terra:none": {
+        "passed": 30,
+        "total": 30,
+        "p50_seconds": 2.069046,
+        "p95_seconds": 3.592399,
+        "max_seconds": 3.631575
+      }
+    }
+  },
+  "supplemental_language_checks": {
+    "dataset": "supplemental_language_checks",
+    "application_cache_size": 0,
+    "candidates": {
+      "gpt-6-astra:low": {
+        "passed": 15,
+        "total": 15,
+        "p50_seconds": 2.756847,
+        "p95_seconds": 3.9747,
+        "max_seconds": 3.9747
+      },
+      "gpt-5.6-terra:none": {
+        "passed": 15,
+        "total": 15,
+        "p50_seconds": 1.896973,
+        "p95_seconds": 4.429486,
+        "max_seconds": 4.429486
+      }
+    }
+  },
+  "selected_profile_http": {
+    "mode": "http_full_pipeline",
+    "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+    "passed": 30,
+    "total": 30,
+    "p95_seconds": 3.005138,
+    "max_seconds": 4.020317,
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "none",
+    "application_cache_size": 0,
+    "live_llm_evaluated": true
+  },
+  "production_profile": {
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "none",
+    "application_cache_size": 128
+  },
+  "limits": "Finite local tests, not proof of hidden-case accuracy or future/deployed latency. In-process comparison excludes a local TCP hop."
+}
