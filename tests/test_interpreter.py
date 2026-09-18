@@ -102,7 +102,7 @@ def test_provider_http_errors_are_not_no_op(scenario, status, caplog):
         interpreter = make_interpreter(handler)
         try:
             with pytest.raises(ProviderError): await interpreter.interpret(scenario)
-            assert len(calls) == 1
+            assert len(calls) == (2 if status in {429, 500, 503} else 1)
             assert not interpreter.cache
         finally:
             await interpreter.close()
@@ -220,6 +220,66 @@ def test_cancelled_request_does_not_cancel_shared_model_call(case, scenario):
             release.set()
             assert await second
             assert interpreter.cache
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("status", [429, 500, 502, 503, 504])
+def test_transient_provider_failure_recovers_once(case, scenario, status):
+    calls = []
+    def handler(request):
+        calls.append(request)
+        if len(calls) == 1:
+            return httpx.Response(status, json={"error": {"message": "Transient", "type": "api_error"}})
+        return httpx.Response(200, json=response_body(json.dumps({"directive_interpretation": case["expected_output"]["directive_interpretation"]})))
+    async def run():
+        interpreter = make_interpreter(handler)
+        try:
+            result = json.loads(await interpreter.interpret(scenario))
+            assert result["directive_interpretation"][0]["directive_type"] == "solar_reduction"
+            assert len(calls) == 2
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("status,code,retry_after", [
+    (401, "invalid_api_key", None), (403, "permission_denied", None),
+    (404, "model_not_found", None), (429, "insufficient_quota", None),
+    (429, "rate_limit_exceeded", "60"), (503, "server_error", "Wed, 01 Jan 2030 00:00:00 GMT"),
+])
+def test_permanent_or_long_backoff_errors_are_not_retried(scenario, status, code, retry_after):
+    calls = []
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(status, headers={"retry-after": retry_after} if retry_after else {},
+                              json={"error": {"message": "Private", "code": code, "type": "api_error"}})
+    async def run():
+        interpreter = make_interpreter(handler)
+        try:
+            with pytest.raises(ProviderError):
+                await interpreter.interpret(scenario)
+            assert len(calls) == 1
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+
+
+def test_retry_is_inside_original_model_deadline(scenario):
+    from dataclasses import replace
+    calls = []
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(503, json={"error": {"message": "Transient", "type": "api_error"}})
+    async def run():
+        interpreter = make_interpreter(handler)
+        interpreter.settings = replace(interpreter.settings, openai_timeout=0.02)
+        try:
+            with pytest.raises(ProviderError):
+                await interpreter.interpret(scenario)
+            assert len(calls) == 1
+            assert not interpreter.cache
         finally:
             await interpreter.close()
     asyncio.run(run())

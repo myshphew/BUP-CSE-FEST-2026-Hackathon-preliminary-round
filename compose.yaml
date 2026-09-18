@@ -1,7 +1,7 @@
 services:
   api:
     build: .
-    image: bup-cse-preliminary-round:1.0.0
+    image: bup-cse-preliminary-round:1.0.1
     ports:
       - "${HOST_PORT:-8000}:8000"
     env_file:
