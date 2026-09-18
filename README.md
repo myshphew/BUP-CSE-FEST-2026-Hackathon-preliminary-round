@@ -4,11 +4,11 @@
 
 ### Understand the notes. Enforce the rules. Minimize the electricity bill.
 
-![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
-![OpenAI](https://img.shields.io/badge/LLM-OpenAI_Responses_API-412991)
-![Solver](https://img.shields.io/badge/Optimization-PuLP_%2B_CBC-blue)
-![Docker](https://img.shields.io/badge/Runtime-Docker-2496ED?logo=docker&logoColor=white)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![OpenAI](https://img.shields.io/badge/LLM-OpenAI_Responses_API-412991?style=for-the-badge)](https://developers.openai.com/api/)
+[![PuLP](https://img.shields.io/badge/Optimizer-PuLP_%2B_CBC-0B6E4F?style=for-the-badge)](https://coin-or.github.io/pulp/)
+[![Docker](https://img.shields.io/badge/Runtime-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 **BUP CSE Fest 2026 Preliminary Round — Smart Campus Energy Optimization Challenge**
 
@@ -16,7 +16,30 @@
 
 A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization Challenge**. The configured OpenAI model interprets operator notes, deterministic guardrails validate the result, PuLP/CBC minimizes 24-hour grid cost, and an independent validator replays the final schedule before it is returned.
 
-**Recorded verification — 18 September 2026:** candidate 1.0.1 passed **243 tests on Windows and 243 inside Linux**, all ten official optimal costs, and **30/30 uncached real-model Docker HTTP requests (p95 2.673 s)**. The existing hosted 1.0.0 separately passed **30/30 uncached official requests (p95 2.642 s)**. These are finite test observations, not a live status monitor or an awarded hidden-judge score.
+## Team
+
+### The Mergers
+
+| # | Member | Role |
+|---:|---|---|
+| 1 | Tanvir Ahmed Siddique | Member |
+| 2 | Emtiaz Ahmed Siam | Member |
+| 3 | Md Mushfique Hussain | Member |
+| 4 | Taskin Billah Tamim | Team Lead |
+
+## At a glance
+
+| Evidence | Verified result |
+|---|---|
+| Full test suite | **243 passed** on Windows and **243 passed** inside Linux |
+| Official sample costs | **10/10 optimal**, zero BDT gap within tolerance |
+| Candidate 1.0.1, real LLM over Docker HTTP | **30/30**, p95 **2.673 s**, cache disabled |
+| Hosted 1.0.0, real LLM | **30/30**, p95 **2.642 s**, cache disabled |
+| Concurrent candidate requests | **10/10** with up to 8 active requests |
+| Language robustness audit | Terra/none, Terra/low and Sol/low each **56/56** on the tested set |
+| Tie-break video | **2:38**, 1080p H.264/AAC, visually and playback verified |
+
+Results were recorded on 18 September 2026. They are evidence from public and supplemental tests, not a claim about hidden-test scores or uninterrupted hosting.
 
 **Contents:** [Project links](#project-links-and-versions) · [Quickstart](#clean-local-quickstart) · [Architecture](#where-the-llm-is-needed-step-by-step) · [API](#api-contract) · [Configuration](#configuration) · [Testing](#testing-and-performance) · [Docker](#docker-and-deployment) · [Rubric](#rubric-and-main-problem-coverage) · [Limitations](#dependencies-attribution-and-limitations)
 
@@ -29,13 +52,11 @@ A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization C
 - **Independent verification:** a separate schedule replay checks physical rules and recalculates totals; independent dynamic-programming tests check optimizer quality.
 - **Reproducible delivery:** pinned dependencies, non-root Docker images, anonymous registry pulls, executable official-sample tests and recorded benchmark evidence.
 
-## Judge audit and version 1.0.1 candidate
+## Why this solution stands out
 
-See the [criterion-by-criterion audit](docs/JUDGE_AUDIT.md), [measured candidate results](docs/audit-verification.json), and [verified 1.0.1 image/run instructions](docs/RELEASE_1_0_1.md). Version 1.0.1 keeps every official minimum electricity cost and adds a second LP that minimizes peak import at the same cost: SAMPLE-01 improves from 187.5 to 175 kWh; SAMPLE-09 from 187 to 170 kWh. It also adds one bounded transient-provider retry and stronger independent optimization tests.
+Version 1.0.1 preserves the minimum electricity bill and then minimizes peak grid import among equally cheap schedules. SAMPLE-01 improves from **187.5 to 175 kWh** and SAMPLE-09 from **187 to 170 kWh**, with no increase in cost. A bounded transient-provider retry improves reliability, while independent replay and dynamic-programming comparisons provide evidence beyond ordinary unit tests.
 
-The candidate passed **243 Windows and Linux container tests**, **30/30 uncached real Terra/low HTTP requests, p95 2.673 seconds**, and all ten official cases with up to eight concurrent requests. Terra none/low and Sol low each passed **56/56** additional live language audit requests. These are finite observations, not a hidden-score guarantee.
-
-The local Compose service uses 1.0.1 with `OPENAI_MODEL=gpt-5.6-terra`, `OPENAI_REASONING_EFFORT=low`, and cache 128. The existing public service remains the verified 1.0.0/Terra-none deployment while the competition deadline/update policy is clarified. The PDFs state 11 PM; the user reported 10 PM, and the applicable date/update rules are unresolved. Do not label the candidate benchmark as hosted 1.0.1 evidence.
+The LLM is used only where the challenge requires language understanding. It cannot calculate or alter the final schedule, bill, battery trajectory, or reported totals. See the [criterion-by-criterion audit](docs/JUDGE_AUDIT.md), [candidate evidence](docs/audit-verification.json), and [release instructions](docs/RELEASE_1_0_1.md).
 
 ## Project links and versions
 
@@ -43,12 +64,12 @@ The local Compose service uses 1.0.1 with `OPENAI_MODEL=gpt-5.6-terra`, `OPENAI_
 |---|---|
 | Hosted API | [Render base URL](https://bup-cse-preliminary-round-1-0-0.onrender.com) — use the endpoints below; `/` is not an application page |
 | Readiness | [GET /health](https://bup-cse-preliminary-round-1-0-0.onrender.com/health) |
-| Interactive API reference | [Swagger UI](https://bup-cse-preliminary-round-1-0-0.onrender.com/docs) |
+| **Live Demo** | [Interactive Swagger UI](https://bup-cse-preliminary-round-1-0-0.onrender.com/docs) |
 | Optimization | `POST https://bup-cse-preliminary-round-1-0-0.onrender.com/optimize-energy` |
-| Source | [Repository](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round) — public judge access still requires owner action |
+| Source | [Repository](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round) |
 | Candidate review | [PR #1](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/pull/1) |
 | Judge audit | [Every scored subcriterion](docs/JUDGE_AUDIT.md) |
-| Solution video | [Transcript and reproduction notes](docs/video/README.md) — 2:38 candidate video is prepared; a private draft release is not a public judge link |
+| Solution video | [Transcript and reproduction notes](docs/video/README.md) — 2:38 candidate video; organizer-accessible link must be submitted |
 
 | Version | Model / effort / cache | Evidence |
 |---|---|---|
@@ -56,15 +77,13 @@ The local Compose service uses 1.0.1 with `OPENAI_MODEL=gpt-5.6-terra`, `OPENAI_
 | Candidate **1.0.1** | Terra / `low` / `128` | Current development branch, local Compose and [published image](docs/RELEASE_1_0_1.md); [candidate verification](docs/audit-verification.json) |
 | Source defaults | Astra / `low` / `128` | `config.py` and `.env.example`; the quickstart explicitly selects the tested candidate profile |
 
-No authentication is required for the judge endpoints. Candidate 1.0.1 has not replaced the hosted 1.0.0 service. Keep source, image, model profile and benchmark scope explicit when submitting.
+No authentication is required for the API endpoints. The hosted service currently runs 1.0.0; candidate 1.0.1 is the reviewed development version and published Docker fallback.
 
 ## Official sources and API permission
 
 The [main problem statement](docs/reference/main_prblm-1.pdf) defines behavior and schemas. The [participant guide and rubric](docs/reference/BUP_CSE_FEST_2026_Participant_Guide__Evaluation_Rubric_GridWise_LLM.pdf) defines scoring, deployment, and submission. The guide, section 04, page 5 explicitly permits **external model APIs or local models**, so OpenAI is allowed. It requires the language model to produce the operator-note interpretation used by the optimizer; phrase matching alone or an AI-written summary is insufficient.
 
-The default model is `gpt-6-astra`, using the OpenAI **Responses API with Structured Outputs**, supported by the [official model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra) and [Structured Outputs guide](https://developers.openai.com/api/docs/guides/structured-outputs). Your account must have access, funded quota, and adequate rate limits during judging.
-
-The current candidate profile is `OPENAI_MODEL=gpt-5.6-terra` with `OPENAI_REASONING_EFFORT=low`; the existing hosted service uses Terra/`none`. Set both variables together. Astra/low remains the source default. These settings affect language interpretation only; the solver supplies all mathematical optimization.
+The service uses the OpenAI **Responses API with Structured Outputs**. Candidate 1.0.1 uses `gpt-5.6-terra` with `low` reasoning; Astra/low remains the source default and hosted 1.0.0 uses Terra/none. Model settings affect language interpretation only. The API account must have model access, quota and suitable rate limits during judging.
 
 The root [official sample pack](BUP_CSE_FEST_2026_Preli_Public_Sample_Cases.json) is a byte-for-byte copy of the supplied organizer file, with 10 cases under `cases`. Each contains `input`, `expected_output`, and supporting metadata. Its SHA-256 is:
 
@@ -225,9 +244,9 @@ Interactive schema documentation is available at `/docs`. Absolute verification 
 | `INTERPRETATION_CACHE_SIZE` | `128` | Bounded cache of successful validated model responses; `0` disables it |
 | `PORT` | `8000` | Port used by `python run.py` and Docker |
 
-`.env` is loaded without overriding existing environment variables. Responses API uses `store=false` and SDK retries are disabled. Version 1.0.1 allows one short application-controlled retry for transient transport/rate/server failures, inside the original 20-second model deadline. Authentication, permission, missing-model, insufficient-quota, timeout, refusal and invalid-output errors still fail safely without retry. Invalid outputs and provider failures are never cached. Cache keys include the exact notes, battery context, prompt, model, and reasoning effort; every cache hit is validated again. Simultaneous identical cache misses share one model call; one client's cancellation does not cancel another's shared request. It is an in-memory cache populated only by actual successful model responses, not a public-case lookup.
+Environment variables take precedence over `.env`; restart after changing either. OpenAI requests use `store=false`. One bounded retry handles selected transient connection/rate/server errors within the original deadline; credential, quota, timeout, refusal and malformed-output failures remain controlled errors.
 
-Use `INTERPRETATION_CACHE_SIZE=128` in normal operation and `0` for uncached latency measurements. Restart the service after editing `.env`; an already-running process retains its startup settings. Caching accelerates repeated notes with identical battery context, but does not make the first unseen note faster.
+Use cache `128` normally and `0` for an uncached benchmark. Only successful validated model results are cached, every hit is revalidated, and simultaneous identical misses share one model request. The cache is not a lookup table of organizer answers and cannot accelerate a new note.
 
 ## Testing and performance
 
@@ -238,7 +257,7 @@ python tests/live_http_smoke.py
 python -m pip check
 ```
 
-Offline evaluation tests math under organizer interpretations. The HTTP smoke script starts real Uvicorn processes, verifies missing-key failure in the production app, and injects official expected interpretations into a **test-only** app to exercise all public cases over sockets. Neither command measures actual language understanding.
+Offline evaluation tests math using organizer interpretations. The socket smoke test uses a **test-only interpreter** and also checks missing-key behavior. Neither command measures actual language understanding; production always uses the OpenAI interpreter.
 
 For actual LLM accuracy and latency, configure the key, run the production app, disable the interpretation cache for a cold-request benchmark, and run:
 
@@ -246,25 +265,15 @@ For actual LLM accuracy and latency, configure the key, run the production app, 
 python -m scripts.evaluate_samples --url http://127.0.0.1:8000 --repeat 3 --output output/live-benchmark.json
 ```
 
-The runner checks interpretation semantics, replays schedules under **organizer ground truth**, compares recalculated cost, and reports nearest-rank p95. Free-text explanations and exact optimal action sequences are not compared. The guide requires every request within 30 seconds and awards full latency credit at p95 <= 5 seconds. Local solver/mock timings do not establish hosted-model p95. Benchmark quota/rate limits and paraphrase accuracy before submitting.
+The runner checks semantics, replays schedules under **organizer ground truth**, recalculates cost and reports nearest-rank p95. The guide requires each request within 30 seconds and gives full latency credit at p95 ≤5 seconds. Restore cache `128` and restart after benchmarking.
 
 Recorded candidate evidence: **243 tests on each of Windows and Linux**, **30/30** uncached Docker HTTP requests (p95 **2.673 s**, maximum **2.774 s**), and **10/10** concurrent real-model requests with up to eight active (maximum **2.952 s**). Terra/none, Terra/low and Sol/low each passed **56/56** language audit requests; selected Terra/low additionally passed **9/9** semantic edge variants. These finite measurements do not guarantee unseen-note accuracy or cold-host latency. [Machine-readable evidence](docs/audit-verification.json).
 
-Compare the configured API account's real model behavior without changing `.env` or restarting your existing server:
-
-```bash
-python -m scripts.benchmark_models --repeat 3 --output output/model-comparison.json
-python -m scripts.benchmark_models --candidate gpt-6-astra:low --candidate gpt-5.6-terra:none --language-checks --repeat 1 --output output/language-checks.json
-python -m scripts.verify_live_http --candidate gpt-5.6-terra:none --repeat 3 --output output/terra-http-benchmark.json
-```
-
-These commands make paid OpenAI calls with application caching forced off. The first two run the production FastAPI pipeline in-process. The default comparison tests Astra/low, Sol/none, and Terra/none in rotating order against the unchanged official pack. The second command uses explicitly labeled supplemental paraphrases and instruction-injection variants of those cases; it never changes the official JSON and is not used by production. The final command launches an isolated temporary Uvicorn server and verifies real HTTP latency, then stops it; it does not disturb your running server or edit `.env`. Results and the model decision are documented in [performance verification](docs/PERFORMANCE.md).
-
-Tests also include isolated invalid-input mutations, overlapping directives, zero capacity/rates/tariffs, surplus solar, fractional values, infeasibility, independent dynamic-programming optimality checks, model refusal/timeouts/rate limits, prompt/data separation, corrupted schedules, deterministic repeat solves, and concurrent requests. Unit variants are explicitly test-only and never alter the official sample pack.
+Supplemental model comparisons cover paraphrases and prompt injection with real uncached calls. Other tests cover invalid inputs, overlaps, numeric edge cases, infeasibility, independent cost checks, provider failures, corrupted schedules, determinism, caching and concurrency. Test variants never alter the official pack. [Detailed performance evidence](docs/PERFORMANCE.md).
 
 ## Docker and deployment
 
-The verified Linux/amd64 image uses Python 3.12, pinned runtime dependencies, an unprivileged user (UID 10001), a health check, and port 8000. Secrets are excluded from the build context. Docker Desktop's earlier Windows prerequisite issue is resolved; the [Windows troubleshooting notes](docs/DOCKER_WINDOWS.md) remain available if needed. With `.env` configured, the restartable local service can be managed using:
+The verified Linux/amd64 image uses Python 3.12, pinned dependencies, an unprivileged user (UID 10001), a health check and port 8000. Secrets are excluded from the build context. With `.env` configured, manage the local service using:
 
 ```bash
 docker compose up -d --build --wait
@@ -274,15 +283,7 @@ docker compose logs --tail 30
 docker compose down
 ```
 
-Compose uses the model/cache values in `.env`, bounded log rotation, and `restart: unless-stopped`. Docker Desktop must itself be running. After changing `.env`, use `docker compose up -d --force-recreate --wait`. If port 8000 is occupied, set `HOST_PORT=8001` in the shell before starting Compose and use that port in local requests. Direct Docker commands are also supported:
-
-```bash
-docker build -t bup-cse-preliminary-round:1.0.1 .
-docker run --rm bup-cse-preliminary-round:1.0.1 python -m scripts.evaluate_samples --offline
-docker run --rm --name gridwise -p 8000:8000 --env-file .env bup-cse-preliminary-round:1.0.1
-```
-
-Run the health and full sample HTTP commands above. Do not substitute the test fixture app for `main:app` or `run.py` in a deployment.
+Compose uses `.env`, bounded log rotation and `restart: unless-stopped`. Docker Desktop must be running. After configuration changes use `docker compose up -d --force-recreate --wait`. If port 8000 is occupied, set `HOST_PORT=8001` before starting. [Windows troubleshooting](docs/DOCKER_WINDOWS.md).
 
 ### Exact published candidate fallback (version 1.0.1)
 
@@ -303,29 +304,52 @@ docker exec gridwise-candidate python -m scripts.evaluate_samples --offline
 
 Expected: HTTP 200 with `{"status":"ok"}`, live `1/1 passed` at **38,365 BDT**, offline `10/10 passed`. The exec command uses the **container** port 8000, while the host uses 8001. Tag: `ghcr.io/myshphew/bup-cse-preliminary-round:1.0.1`. [Verified publication workflow](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35372128259).
 
-### Exact published fallback (current public service, version 1.0.0)
+### Hosted 1.0.0 fallback record
 
-From a directory containing your privately configured `.env`, pull and run the tested immutable image:
+The immutable image matching the hosted version remains available at `ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f`. Candidate 1.0.1 above is the recommended fallback. Both images passed anonymous pull, health and sample execution. Credentials are supplied only at runtime through `.env` or the hosting platform's secret manager.
+
+The GitHub Actions publication workflow runs tests and container checks before pushing. Submission must include the public API, public repository, exact image reference and an accessible ≤3-minute video. Generated packages and checksums are under `output/submission/1.0.1/`; see the [submission checklist](docs/SUBMISSION.md) and [deployment runbook](docs/DEPLOYMENT.md).
+
+## How judges will evaluate the service
+
+The organizer's harness evaluates the submitted pipeline in this order:
+
+1. **Start and readiness:** start the submitted service or Docker image and require `GET /health` to return `{"status":"ok"}` within 60 seconds.
+2. **API validation:** send valid, malformed and semantically invalid requests to the exact endpoints and check status codes and schemas.
+3. **Hidden-note interpretation:** compare relevance, directive type, hours, numeric values and adjustment shape against organizer ground truth. One ordered entry is required for every note.
+4. **Ground-truth replay:** ignore any convenient claim made by our response and replay `hourly_plan` using the organizer's true directive. They check solar, balance, battery transitions/bounds/rates, blocked actions, grid caps and day-end neutrality.
+5. **Recalculate outputs:** recompute total grid, electricity cost and peak from the returned 24 rows. Invalid cases receive no optimization credit.
+6. **Score valid cost:** compare our recalculated cost with the organizer optimum over hidden cases.
+7. **Measure reliability:** repeat valid hidden requests, enforce the 30-second request limit and score p95 latency and failure rate.
+8. **Reproduce artifacts:** follow this README from a clean environment, pull/run the image, check `/health`, run a public sample, inspect secret handling and verify endpoint/repository/video access.
+9. **Apply tie-breakers:** for equal base scores, review the ≤3-minute video first, then correctness, interpretation, cost, API, reliability, documentation and exceptional engineering.
+
+### How we test the same path
+
+| Judge check | Our corresponding check |
+|---|---|
+| Clean startup and health | Local Python, Docker/Compose, Linux CI and real `/health` requests |
+| Exact schema and safe errors | API/model tests for malformed JSON, extra fields, bounds, provider failures, refusal and timeouts |
+| Natural-language interpretation | Real-model official samples plus supplemental paraphrases, numeric wording and prompt-injection cases |
+| Ground-truth directives | `scripts.evaluate_samples` replays output using organizer interpretations |
+| Energy and battery validity | Independent `schedule_validator.py` replay and corrupted-schedule rejection tests |
+| Optimal cost | All ten official optima plus independent dynamic-programming comparisons on additional numeric scenarios |
+| Latency and stability | Cache-off repeated HTTP benchmark and concurrent real-model requests |
+| Docker fallback | Anonymous digest pull, non-root execution, `/health`, ten offline cases and a real-model request |
+| Reproducibility and secrets | Pinned dependencies, README link/command checks, `.env` exclusion and fixed public error/logging tests |
+
+Run the core judge-style sequence after configuring the service:
 
 ```bash
-docker pull ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f
-docker run --rm --name gridwise -p 8000:8000 --env-file .env -e OPENAI_MODEL=gpt-5.6-terra -e OPENAI_REASONING_EFFORT=none -e PORT=8000 ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f
-```
-
-In another terminal (use `curl.exe` on Windows):
-
-```bash
+python -m pytest -q
+python -m scripts.evaluate_samples --offline
+python run.py
+# In another terminal:
 curl http://127.0.0.1:8000/health
-docker exec gridwise python -m scripts.evaluate_samples --url http://127.0.0.1:8000 --limit 1
+python -m scripts.evaluate_samples --url http://127.0.0.1:8000 --repeat 3 --output output/live-benchmark.json
 ```
 
-The included official sample is used by that explicit verification command; the production API does not load it. Expected SAMPLE-01 cost: **38,365 BDT**. If port 8000 is occupied, change the left port to 8001 and use 8001 for the host health request; the `docker exec` command still uses the container's port 8000. The required credential is `OPENAI_API_KEY`, supplied only at runtime. Judge credentials must be provided through an organizer-approved private channel if required, never published in the repository.
-
-The optional **Publish tested Docker image** GitHub Actions workflow publishes to GHCR using GitHub's job token after tests, offline container verification, and a readiness check pass. It records the exact digest and verifies an authenticated registry pull. The package owner must separately enable and verify anonymous pulls for judges. See [the publication runbook](docs/DEPLOYMENT.md); this workflow was pushed and [ran successfully](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35364973349). Anonymous pulls and execution of the published digest have passed.
-
-Deploy the same image on a publicly reachable platform with `OPENAI_API_KEY` supplied through its secret manager. Keep both judge endpoints accessible without a login, VPN, or manual action. Verify both endpoints **from outside the development machine** and keep the service and image available throughout evaluation. The existing [GitHub CI run for commit c9f0040 passed](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35361197350).
-
-The guide also requires repository visibility/timing rules and a maximum three-minute solution video. See [the submission checklist](docs/SUBMISSION.md) and [video transcript/reproduction notes](docs/video/README.md). The candidate video is `output/submission/1.0.1/gridwise-solution.mp4` (**2:38**); the candidate image archive is `output/submission/1.0.1/gridwise-1.0.1.tar`. Earlier 1.0.0 artifacts remain in `output/submission/`. Checksums and manifests are alongside them. These generated files are intentionally outside Git. Images are published; videos are uploaded to private draft releases. The public API and anonymous image access are verified; final organizer submission and public repository/video access remain.
+Use cache `0` and restart before the timed run, then restore cache `128`. Offline tests prove deterministic scheduling against known semantics; only the live command evaluates the actual LLM. Finally repeat `/health` and one official sample against the submitted public URL from another network, and pull the submitted image anonymously.
 
 ## Rubric and main problem coverage
 
