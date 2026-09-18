@@ -44,7 +44,7 @@ This is an exact LP for the specified battery. Every signed flow maps to exactly
 
 Overlaps combine in input note order, with solar factors multiplied, reserves maximized, and grid caps minimized. A no-charge directive sets the upper flow bound to zero; a no-discharge directive sets the lower flow bound to zero. Both restrictions at the same hour force idle.
 
-CBC runs with one thread, fixed seeds, fixed variable/constraint ordering, and tight numerical solver tolerances. Only an optimal solver status is accepted. No arbitrary peak-grid penalty is added to the required cost objective. Alternative optimal plans need not match the organizer action sequence or peak exactly.
+CBC runs with one thread, fixed seeds, fixed variable/constraint ordering, and tight numerical solver tolerances. Only an optimal solver status is accepted. The first solve establishes the required minimum grid cost. A second solve fixes that cost and minimizes peak grid import among cost-optimal schedules. Both solves share the original three-second solver budget. A failed optional refinement restores the saved primary optimum. No arbitrary peak weight is mixed into the electricity-cost objective. Alternative optimal plans need not match the organizer action sequence exactly.
 
 The solution file has finite precision. Sub-micro-kWh residuals at zero import are corrected to prevent negative solar/grid serialization. Battery states and totals are recalculated from the returned actions/flows. Independent replay still must pass the official absolute 0.01 tolerance. The fractional regression test covers this correction.
 
@@ -68,9 +68,9 @@ This boundary does not provide a mathematical guarantee of semantic accuracy. A 
 
 - One batched interpretation call for 1–3 notes, with `low` reasoning for Astra and a compact semantic output. Sol/Terra can also be evaluated with `none` reasoning; the service rejects that unsupported setting for Astra.
 - No model-generated summary or schedule.
-- Shared asynchronous client, no SDK retries, a 20-second model deadline, and a 28-second application deadline including queue wait.
+- Shared asynchronous client, SDK retries disabled, and at most one application-controlled retry for transient connection/rate/server errors. Both attempts share the same 20-second model deadline; the 28-second request deadline includes queue time. Authentication, permission, missing-model, insufficient-quota, model-output and provider-timeout failures are not retried. Long or unsupported Retry-After values cause safe failure instead of an early retry.
 - Eight concurrent pipelines per worker by default; the solver runs off the event loop.
 - At most 128 successful validated interpretation responses cached in memory. Cache hits are revalidated; changed battery context invalidates the key. No failures or sample fixtures are cached. Concurrent identical misses share one model call with cancellation isolation. When the cache is disabled, every request calls the model independently for honest uncached measurements.
 - CBC has a three-second solve budget. Canceling an async request does not forcibly terminate an already-running worker thread; its solver has its own bounded execution time.
 
-These choices limit processing overhead. They do not establish the rubric's p95 target for a hosted model or overloaded service; measure the actual deployed path with the cache disabled for cold-request latency.
+The 1.0.1 candidate passed 243 tests, 30/30 uncached Terra/low Docker HTTP requests (p95 2.673 seconds), and all ten official cases with up to eight concurrent real requests. These choices and finite tests do not establish the rubric's p95 target for a hosted model or overloaded service; measure the actual deployed path with the cache disabled for cold-request latency.

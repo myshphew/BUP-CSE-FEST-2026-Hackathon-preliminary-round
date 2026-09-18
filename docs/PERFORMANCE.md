@@ -29,7 +29,7 @@ Astra's p95 on this set was 3.975 seconds; Terra's was 4.429 seconds. With only 
 
 ## Selected local profile
 
-The local `.env` now contains:
+The earlier local profile used (the audit candidate now uses Terra/low):
 
 ```dotenv
 OPENAI_MODEL=gpt-5.6-terra
@@ -78,3 +78,7 @@ An initial smoke request immediately after the corrected-key deployment passed i
 The production cache is restored to 128 after measurement. Results and final deployment checks are in [public-verification.json](public-verification.json), with all 30 observations in [public-live-benchmark.json](public-live-benchmark.json). Successful finite samples do not guarantee hidden-case correctness or future latency. [Render Free](https://render.com/docs/free) sleeps after 15 idle minutes and takes about one minute to resume; a different model or result caching cannot remove that platform limit.
 
 Final organizer submission and public repository/video access remain. See [current next steps](NEXT_STEPS.md).
+
+## 1.0.1 reasoning audit
+
+Terra/none, Terra/low and Sol/low each passed 56/56 live language audit requests. No measured accuracy improvement from increased reasoning was established. Terra/low was selected locally as an accuracy-first candidate with observed latency margin: 30/30 uncached Docker HTTP official requests passed, p95 2.673 s, max 2.774 s. The public service remains Terra/none until an allowed promotion and hosted benchmark. See [full model comparison and limits](JUDGE_AUDIT.md).

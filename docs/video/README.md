@@ -1,18 +1,18 @@
 # Solution video
 
-The local MP4 is `output/submission/gridwise-solution.mp4`: **2:44**, 1920×1080, 24 fps, H.264/AAC. It was visually checked, and a full audio/video decode succeeded. It is below the organizer's three-minute maximum.
+The current audit candidate video is `output/submission/1.0.1/gridwise-solution.mp4`: **2:38**, 1920x1080, 24 fps, H.264/AAC. All seven slides were visually inspected and the full audio/video stream decoded successfully. It is below the organizer's three-minute maximum.
 
-Seven scenes explain the problem, architecture, a real official interpretation, optimization, verification, Docker execution, and performance. Screens use recorded local API evidence and actual test results. This is an architecture explainer with recorded results, not a public deployment screen capture. Narration uses the installed Microsoft David synthetic voice. Review the [transcript](TRANSCRIPT.md); the team may replace narration with its own recording.
+It explains the problem, the LLM/guardrail/optimizer/replay boundary, actual official interpretation, cost-first/peak-second optimization, independent verification, Docker execution and the measured Terra/low profile. Screens use actual 1.0.1 container responses and audit reports; they are not a hosted 1.0.1 benchmark. Narration uses the installed Microsoft David synthetic voice. Review the [transcript](TRANSCRIPT.md); the team should understand every architectural choice.
 
-The MP4, supporting evidence, image archive, manifest, and checksums are in the ignored `output/submission/` folder. Upload the MP4 to the organizer or an accessible video host. It has not been uploaded automatically.
+The earlier 2:44 video is preserved at `output/submission/gridwise-solution.mp4` for the existing 1.0.0 release. Keep candidate and submitted versions clearly identified. A video in a draft release/private repository is not publicly accessible to judges; submit it through the permitted channel.
 
 ## Rebuild on this Windows machine
 
-Optional media tools are separate from the API requirements and Docker image:
+Optional media tools are separate from API dependencies:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install --target tmp/media-tools Pillow imageio-ffmpeg
 .\.venv\Scripts\python.exe docs/video/build_video.py
 ```
 
-Required inputs are `output/submission/sample-01-live-response.json`, `docs/docker-verification.json`, Windows Segoe UI fonts, and the Microsoft David Desktop voice. The script makes no API calls and reads no credentials. It checks the three-minute ceiling before rendering. Narration and slides are in `build_video.py`; the PowerShell helper only synthesizes supplied text. When changing measured results, update narration/evidence together, regenerate, and refresh the checksum.
+Required inputs: `output/submission/1.0.1/sample-01-response.json`, `docs/audit-verification.json`, Windows Segoe UI fonts and the Microsoft David Desktop voice. The script makes no API calls and reads no credentials. It checks the three-minute ceiling before rendering. When changing measured results, update narration and evidence together, regenerate, visually inspect, decode and refresh checksums.

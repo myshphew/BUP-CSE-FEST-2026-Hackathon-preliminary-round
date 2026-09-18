@@ -39,3 +39,7 @@ The public image's source commit is `60ec64fb7c1dc70a462cca795d4c71e712e981f0`. 
 [Render Free](https://render.com/docs/free) suspends the instance after 15 minutes without traffic and can take about a minute to wake. The passing benchmark measures a running instance, not wake-up after idle. Cache 128 speeds repeated interpretations but cannot remove this host cold-start limit. Continuous availability and every cold request below 30 seconds are therefore not guaranteed. The pullable Docker image is the tested fallback. No paid hosting plan was enabled.
 
 The optional [Render Blueprint](../deploy/render-free.yaml) creates an independent service if explicitly applied; it does not manage the existing service automatically. It starts with cache zero for measurement. The current deployed service has cache 128. OpenAI API usage still consumes the existing account's quota.
+
+## New audited candidate
+
+Version 1.0.1 is implemented, published, anonymously pullable and running locally with Terra/low. It preserves official minimum bills, lowers peaks on two official cases, and adds bounded transient retries. It passed 243 tests and 30/30 uncached Docker HTTP requests, p95 2.673 s. It is kept separate from the public competition service while deadline/update eligibility is clarified. See [the complete judge audit](JUDGE_AUDIT.md) and [candidate promotion instructions](RELEASE_1_0_1.md). The updated candidate video is 2:38 and is in `output/submission/1.0.1/`.

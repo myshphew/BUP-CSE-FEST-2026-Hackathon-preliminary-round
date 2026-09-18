@@ -4,6 +4,14 @@ A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization C
 
 **Verification status:** 165 tests passed inside Linux Docker; all 10 official sample optimal costs match. Real OpenAI requests through the container passed **30/30 with caching disabled, p95 3.667 seconds**. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. A narrated 2:44 solution video and an exported Docker image are prepared locally. The GHCR image is anonymously pullable. The public Render API passed **30/30 uncached official requests, p95 2.642 seconds, maximum 3.380 seconds**. See [current next steps](docs/NEXT_STEPS.md). See [verification evidence](docs/VERIFICATION.md), [measured model performance](docs/PERFORMANCE.md), and [remaining deployment steps](docs/DEPLOYMENT.md). These results are not a claimed hidden-judge score.
 
+## Judge audit and version 1.0.1 candidate
+
+See the [criterion-by-criterion audit](docs/JUDGE_AUDIT.md), [measured candidate results](docs/audit-verification.json), and [verified 1.0.1 image/run instructions](docs/RELEASE_1_0_1.md). Version 1.0.1 keeps every official minimum electricity cost and adds a second LP that minimizes peak import at the same cost: SAMPLE-01 improves from 187.5 to 175 kWh; SAMPLE-09 from 187 to 170 kWh. It also adds one bounded transient-provider retry and stronger independent optimization tests.
+
+The candidate passed **243 Windows and Linux container tests**, **30/30 uncached real Terra/low HTTP requests, p95 2.673 seconds**, and all ten official cases with up to eight concurrent requests. Terra none/low and Sol low each passed **56/56** additional live language audit requests. These are finite observations, not a hidden-score guarantee.
+
+The local Compose service uses 1.0.1 with `OPENAI_MODEL=gpt-5.6-terra`, `OPENAI_REASONING_EFFORT=low`, and cache 128. The existing public service remains the verified 1.0.0/Terra-none deployment while the competition deadline/update policy is clarified. The PDFs state 11 PM; the user reported 10 PM, and the applicable date/update rules are unresolved. Do not label the candidate benchmark as hosted 1.0.1 evidence.
+
 ## Public service
 
 Base URL: https://bup-cse-preliminary-round-1-0-0.onrender.com
@@ -134,7 +142,7 @@ Interactive schema documentation is available at `/docs`. Absolute verification 
 | `INTERPRETATION_CACHE_SIZE` | `128` | Bounded cache of successful validated model responses; `0` disables it |
 | `PORT` | `8000` | Port used by `python run.py` and Docker |
 
-`.env` is loaded without overriding existing environment variables. Responses API uses `store=false` and SDK retries are disabled to keep failure latency bounded. Invalid outputs and provider failures are never cached. Cache keys include the exact notes, battery context, prompt, model, and reasoning effort; every cache hit is validated again. Simultaneous identical cache misses share one model call; one client's cancellation does not cancel another's shared request. It is an in-memory cache populated only by actual successful model responses, not a public-case lookup.
+`.env` is loaded without overriding existing environment variables. Responses API uses `store=false` and SDK retries are disabled. Version 1.0.1 allows one short application-controlled retry for transient transport/rate/server failures, inside the original 20-second model deadline. Authentication, permission, missing-model, insufficient-quota, timeout, refusal and invalid-output errors still fail safely without retry. Invalid outputs and provider failures are never cached. Cache keys include the exact notes, battery context, prompt, model, and reasoning effort; every cache hit is validated again. Simultaneous identical cache misses share one model call; one client's cancellation does not cancel another's shared request. It is an in-memory cache populated only by actual successful model responses, not a public-case lookup.
 
 Use `INTERPRETATION_CACHE_SIZE=128` in normal operation and `0` for uncached latency measurements. Restart the service after editing `.env`; an already-running process retains its startup settings. Caching accelerates repeated notes with identical battery context, but does not make the first unseen note faster.
 
@@ -184,12 +192,30 @@ docker compose down
 Compose uses the model/cache values in `.env`, bounded log rotation, and `restart: unless-stopped`. Docker Desktop must itself be running. After changing `.env`, use `docker compose up -d --force-recreate --wait`. If port 8000 is occupied, set `HOST_PORT=8001` in the shell before starting Compose and use that port in local requests. Direct Docker commands are also supported:
 
 ```bash
-docker build -t bup-cse-preliminary-round:1.0.0 .
-docker run --rm bup-cse-preliminary-round:1.0.0 python -m scripts.evaluate_samples --offline
-docker run --rm --name gridwise -p 8000:8000 --env-file .env bup-cse-preliminary-round:1.0.0
+docker build -t bup-cse-preliminary-round:1.0.1 .
+docker run --rm bup-cse-preliminary-round:1.0.1 python -m scripts.evaluate_samples --offline
+docker run --rm --name gridwise -p 8000:8000 --env-file .env bup-cse-preliminary-round:1.0.1
 ```
 
 Run the health and full sample HTTP commands above. Do not substitute the test fixture app for `main:app` or `run.py` in a deployment.
+
+### Exact published fallback (current public service, version 1.0.0)
+
+From a directory containing your privately configured `.env`, pull and run the tested immutable image:
+
+```bash
+docker pull ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f
+docker run --rm --name gridwise -p 8000:8000 --env-file .env -e OPENAI_MODEL=gpt-5.6-terra -e OPENAI_REASONING_EFFORT=none -e PORT=8000 ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f
+```
+
+In another terminal (use `curl.exe` on Windows):
+
+```bash
+curl http://127.0.0.1:8000/health
+docker exec gridwise python -m scripts.evaluate_samples --url http://127.0.0.1:8000 --limit 1
+```
+
+The included official sample is used by that explicit verification command; the production API does not load it. Expected SAMPLE-01 cost: **38,365 BDT**. If port 8000 is occupied, change the left port to 8001 and use 8001 for the host health request; the `docker exec` command still uses the container's port 8000. The required credential is `OPENAI_API_KEY`, supplied only at runtime. Judge credentials must be provided through an organizer-approved private channel if required, never published in the repository.
 
 Publish to your own registry after testing; the following is a **template**, not an existing published image. Replace `YOUR_NAMESPACE` with the authenticated registry owner and record the actual immutable digest in your submission:
 
