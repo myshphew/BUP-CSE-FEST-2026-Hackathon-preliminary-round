@@ -69,6 +69,12 @@ Docker Engine 29.8.0 now works. A clean Linux/amd64 image build succeeded, and a
 
 The current service runs through Compose at `http://127.0.0.1:8000` with cache **128**. A new SAMPLE-01 request took 2.384 seconds; its cached repeat took 0.007 seconds, both with the correct interpretation and cost. These timings are observations, not a guarantee. The container p95 remains within the rubric's five-second target even though one of the 30 requests exceeded five seconds.
 
-## Remaining external action
+## Verified public Render performance
 
-Public hosting and registry publication still need a chosen provider/account and verified access. [The deployment runbook](DEPLOYMENT.md) and a manual GHCR publishing workflow are prepared. The current GitHub repository is public; an owner must ensure its visibility matches the event deadline requirements. The available GitHub account has push permission, but no repository administration permission.
+On 2026-09-18, the public HTTPS API on Render Free (Oregon) passed **30/30** official requests with application cache **0**, Terra/none, and the published 1.0.0 image. **p95: 2.641738 seconds; maximum: 3.379812 seconds.** This includes public-network HTTP transport, the real OpenAI call, deterministic optimization, and independent ground-truth replay. The sample file checksum was verified before evaluation.
+
+An initial smoke request immediately after the corrected-key deployment passed in 8.596 seconds; it is recorded separately from the 30-request benchmark. The benchmark measures a running instance, not wake-up from Render's idle suspension. The earlier attempt with an incorrect hosted key failed; those failures are preserved separately and are not latency evidence for successful requests.
+
+The production cache is restored to 128 after measurement. Results and final deployment checks are in [public-verification.json](public-verification.json), with all 30 observations in [public-live-benchmark.json](public-live-benchmark.json). Successful finite samples do not guarantee hidden-case correctness or future latency. [Render Free](https://render.com/docs/free) sleeps after 15 idle minutes and takes about one minute to resume; a different model or result caching cannot remove that platform limit.
+
+Final organizer submission and public repository/video access remain. See [current next steps](NEXT_STEPS.md).

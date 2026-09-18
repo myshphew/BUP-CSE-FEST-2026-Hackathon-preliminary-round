@@ -1,4 +1,4 @@
-# Local verification evidence
+# Verification evidence
 
 Date: 2026-09-18. Host: Windows x64. Runtime: Python 3.12.14 in `.venv`, created using the available Codex workspace runtime because the system default Python is 3.10. Install Python 3.11+ on a clean machine before recreating this environment. Packages are pinned in `requirements.txt` and `requirements.lock`.
 
@@ -12,7 +12,7 @@ Date: 2026-09-18. Host: Windows x64. Runtime: Python 3.12.14 in `.venv`, created
 | Dependency installation | Installed successfully into isolated Python 3.12 environment |
 | `pip check` | No broken requirements found |
 | CBC availability | Bundled executable ran startup LP and all test optimization problems |
-| `python -m pytest -q` | 165 passed after latency/cache changes; two upstream dependency deprecation warnings |
+| `python -m pytest -q` | 168 passed after safe provider diagnostic logging; two upstream dependency deprecation warnings. The deployed 1.0.0 image was validated with 165 tests. |
 | Official offline runner | 10/10 passed; all optimal costs match exactly; one run p95 0.023 seconds |
 | Independent optimum oracle | 12 integer-input unit variants agree with a separate dynamic-programming implementation |
 | Real production Uvicorn, missing key | `/health` and valid `/optimize-energy` safely return HTTP 500 `service_not_ready`; malformed JSON returns 400 |
@@ -36,9 +36,13 @@ Date: 2026-09-18. Host: Windows x64. Runtime: Python 3.12.14 in `.venv`, created
 | Submission video | Narrated 1080p H.264/AAC MP4, 2:44; frames visually inspected; full audio/video decode passed; uses recorded local results |
 | Local image archive | Exported Docker image to `output/submission/gridwise-1.0.0.tar`; checksums and submission manifest generated |
 | Archive and workflow checks | Docker archive loaded successfully; source ZIP integrity passed and excludes `.env`; both GitHub workflows pass actionlint/ShellCheck; Compose configuration validates |
-| Public deployment / registry mutation | Not performed |
+| GHCR publication | Workflow run 35364973349 succeeded; digest recorded in registry-publication.json; authenticated and anonymous pulls passed; published image passed 10/10 offline cases and a real OpenAI smoke request |
 
 The offline and fixture HTTP tests supply organizer expected interpretations; **those rows do not evaluate real model understanding**. The additional live-comparison and language-check rows use genuine OpenAI calls with the configured local key. No key is included in reports. The live comparison runs the production FastAPI pipeline in-process; verify the final profile over TCP as documented in [performance results](PERFORMANCE.md). Test-only fixture modules are excluded from Docker.
+
+## Hosted verification
+
+The public Render Free service passed **30/30** official requests with cache disabled: p95 **2.641738 seconds**, maximum **3.379812 seconds**. The corrected API key was loaded through a new deployment before this run. See [public-verification.json](public-verification.json) for the immutable image, hosted settings, final cache verification, and limitations. [Diagnostic-change CI passed](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35368634227); that logging-only change is not part of the deployed 1.0.0 image.
 
 ## Public optimal costs
 
@@ -60,9 +64,9 @@ Every computed schedule also passed independent replay under the official interp
 ## Not yet verified
 
 - OpenAI access and the documented live tests have passed, but finite public/supplemental tests cannot establish perfect accuracy on hidden notes or guarantee future provider latency/quota.
-- Public hosting, anonymous registry pulls, and an independent external-network request are not yet verified. The local archive is not a substitute for the required pullable registry reference.
-- The existing CI passed, but the new manual publishing workflow and documentation/Compose changes are local and have not been pushed. The publishing workflow has not run.
-- The 2:44 video is created locally but still needs organizer-accessible upload/submission.
-- GitHub metadata reports the repository is currently public, created at 2026-09-18T13:13:45Z. The question-reveal/deadline times were not supplied, so event timing compliance cannot be determined. The connected account cannot change repository visibility.
+- Public hosting and anonymous registry pulls are verified from this development computer over the public internet. A successful request from a separate independent client network and idle cold-start latency are not established. The browser search service could not fetch the health endpoint; this is not evidence of an application failure, since direct HTTPS checks pass.
+- Both CI and the publishing workflow passed for deployed commit 60ec64f. The image is published and anonymously pullable. Source changes after that commit are distinct from the deployed image and are identified in the submission manifest.
+- The 2:44 video is uploaded to a private draft GitHub release. It still needs publication/organizer submission at the appropriate time.
+- The latest GitHub metadata reports the repository is now private, created at 2026-09-18T13:13:45Z. The question-reveal/deadline times were not supplied, so event timing compliance cannot be determined. The connected account cannot change repository visibility.
 
 Reproduce locally with the README commands. Generated detailed reports are in ignored `output/`; they are evidence from individual runs, not official judge results. Update this file after live/container/deployment verification rather than treating planned checks as completed.

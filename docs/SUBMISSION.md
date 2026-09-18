@@ -1,6 +1,6 @@
 # Final submission checklist
 
-The implementation, Linux Docker verification, real OpenAI benchmark, and local video are complete. Public hosting, registry publication, and organizer submission still require external account access. Do not submit localhost or the local image tag as public references.
+The public Render API passed 30/30 uncached official requests (p95 2.642 seconds); anonymous GHCR pulls are verified. The video is uploaded to a private draft release. Final organizer submission and public repository/video access remain. See [current steps and submission references](NEXT_STEPS.md). Do not submit localhost or the local image tag as public references.
 
 ## Prepared and verified locally
 
@@ -14,14 +14,14 @@ The implementation, Linux Docker verification, real OpenAI benchmark, and local 
 - `output/submission/sample-01-request.json`, `sample-01-live-response.json`, and `health.json`: official input and actual local service responses.
 - Manual GHCR publishing workflow, Compose configuration, README, rubric mapping, reports, and [deployment runbook](DEPLOYMENT.md).
 
-Generated files under `output/` are ignored by Git and have not been uploaded. The image archive does not replace the registry requirement.
+Generated files under `output/` are ignored by Git. The video and verification reports have been uploaded to a private draft release; the image was published separately through GHCR. The image archive does not replace the registry requirement.
 
 ## External steps still required
 
-1. **Check repository visibility against the event deadline.** The repository is public. Its owner must keep it private during the event and make it public after the deadline. The connected account cannot change visibility. Question-reveal/deadline times are unknown, so timing compliance is unresolved.
-2. **Publish the fallback image.** Use the prepared GHCR workflow or your authenticated registry. Record the actual tag/digest and verify anonymous pull/run. See [exact instructions](DEPLOYMENT.md).
-3. **Deploy the API.** Select a hosting account, deploy the Dockerfile/image, and inject the OpenAI key through the host's secret manager. Use the tested model/cache settings.
-4. **Verify the public service.** From outside this computer, test both endpoints and all official inputs. Measure uncached hosted p95, then restore cache 128 and restart/redeploy. Keep the service available throughout judging.
+1. **Check repository visibility against the event deadline.** The repository is now private. Its owner must keep it private during the event and make it public after the deadline. The connected account cannot change visibility. Question-reveal/deadline times are unknown, so timing compliance is unresolved.
+2. **Use the verified fallback image.** The exact published digest in [current steps](NEXT_STEPS.md) passed anonymous pull/run verification.
+3. **Use the verified public API.** Render Free is deployed with Terra/none and cache 128. The key is supplied through Render environment secrets. Public uncached evaluation passed 30/30; see [hosted evidence](public-verification.json).
+4. **Check availability before judging.** Test from another network. Render Free sleeps after idle, which can exceed the 30-second limit; warm-instance benchmark success does not establish uninterrupted availability.
 5. **Upload the video.** Submit the prepared MP4 or an organizer-accessible link. Review the [transcript](video/TRANSCRIPT.md) and ensure the team can explain the implementation.
 6. **Submit real references.** Provide the public base URL, repository, README/configuration, pullable image reference, and video. Never put a secret in a public submission field.
 
