@@ -37,7 +37,7 @@ def create_app(settings: Settings | None = None, interpreter: Interpreter | None
             if isinstance(active_interpreter, OpenAIInterpreter):
                 await active_interpreter.close()
 
-    application = FastAPI(title="GridWise Campus Energy Optimizer", version="1.0.0", lifespan=lifespan)
+    application = FastAPI(title="GridWise Campus Energy Optimizer", version="1.0.1", lifespan=lifespan)
 
     @application.middleware("http")
     async def contain_unexpected_errors(request: Request, call_next):

@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import math
 from collections import OrderedDict
 from typing import Protocol
 
@@ -15,6 +16,28 @@ from models import Extraction, Scenario
 from validator import validate_extraction, validate_interpretation
 
 logger = logging.getLogger("gridwise")
+
+
+def transient_retry_delay(exc: APIError) -> float | None:
+    """One short retry for transient transport/rate/server errors, never quota/auth.
+
+    The caller keeps both attempts inside the original model deadline. Respect a
+    numeric Retry-After only when it allows a short retry; never retry earlier.
+    """
+    if isinstance(exc, APITimeoutError) or getattr(exc, "code", None) == "insufficient_quota":
+        return None
+    status = getattr(exc, "status_code", None)
+    if not isinstance(exc, APIConnectionError) and status not in {429, 500, 502, 503, 504}:
+        return None
+    response = getattr(exc, "response", None)
+    header = response.headers.get("retry-after") if response is not None else None
+    if header is None:
+        return 0.2
+    try:
+        delay = float(header)
+    except (ValueError, TypeError):
+        return None
+    return max(0.2, delay) if math.isfinite(delay) and 0 <= delay <= 1 else None
 
 
 def log_provider_failure(exc: Exception) -> None:
@@ -144,18 +167,26 @@ class OpenAIInterpreter:
     async def _fetch(self, payload: str, scenario: Scenario, key: str) -> str:
         try:
             async with asyncio.timeout(self.settings.openai_timeout):
-                response = await self.client.responses.create(
-                    model=self.settings.model,
-                    reasoning={"effort": self.settings.reasoning_effort},
-                    instructions=SYSTEM_PROMPT,
-                    input=[{"role": "user", "content": payload}],
-                    text={"format": {
-                        "type": "json_schema", "name": "campus_directives", "strict": True,
-                        "schema": self.schema,
-                    }},
-                    max_output_tokens=self.settings.max_output_tokens,
-                    store=False,
-                )
+                for attempt in range(2):
+                    try:
+                        response = await self.client.responses.create(
+                            model=self.settings.model,
+                            reasoning={"effort": self.settings.reasoning_effort},
+                            instructions=SYSTEM_PROMPT,
+                            input=[{"role": "user", "content": payload}],
+                            text={"format": {
+                                "type": "json_schema", "name": "campus_directives", "strict": True,
+                                "schema": self.schema,
+                            }},
+                            max_output_tokens=self.settings.max_output_tokens,
+                            store=False,
+                        )
+                        break
+                    except APIError as exc:
+                        delay = transient_retry_delay(exc) if attempt == 0 else None
+                        if delay is None:
+                            raise
+                        await asyncio.sleep(delay)
         except (APIError, TimeoutError) as exc:
             log_provider_failure(exc)
             raise ProviderError() from exc

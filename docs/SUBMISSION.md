@@ -2,7 +2,18 @@
 
 The public Render API passed 30/30 uncached official requests (p95 2.642 seconds); anonymous GHCR pulls are verified. The video is uploaded to a private draft release. Final organizer submission and public repository/video access remain. See [current steps and submission references](NEXT_STEPS.md). Do not submit localhost or the local image tag as public references.
 
-## Prepared and verified locally
+## Current candidate 1.0.1
+
+- Current development branch: `codex/render-provider-diagnostics`, reviewed in PR #1; source quickstart is in the root README.
+- Local Compose now uses **1.0.1 / Terra-low / cache 128**. Public Render still uses **1.0.0 / Terra-none / cache 128**.
+- Candidate passed **243 tests on Windows and 243 inside Linux**, all official optimum costs, and **30/30** uncached real-model Docker HTTP requests at p95 **2.673 seconds**. [Recorded results](audit-verification.json).
+- The published candidate image is anonymously pullable; [exact digest and run procedure](RELEASE_1_0_1.md). Do not label its local results as hosted-candidate results.
+- Candidate package: `output/submission/1.0.1/`, including source archive, image archive, reports, manifest, checksums and the **2:38** video. It is uploaded to a separate private draft release. Public access and submission are still pending.
+- Both PDFs specify an 11 PM deadline; the previously reported 10 PM time conflicts. Applicable timing and permission to update the submission must be established with the organizer before promoting the candidate.
+
+## Historical 1.0.0 preparation evidence
+
+The following describes the earlier version and retained root-level artifacts, not the current local Compose profile:
 
 - 165 tests pass inside Linux Docker. All ten official costs match.
 - Real OpenAI requests through the container: 30/30 pass with cache 0; p95 3.667 seconds.
@@ -21,11 +32,11 @@ Generated files under `output/` are ignored by Git. The video and verification r
 1. **Check repository visibility against the event deadline.** The repository is now private. Its owner must keep it private during the event and make it public after the deadline. The connected account cannot change visibility. Question-reveal/deadline times are unknown, so timing compliance is unresolved.
 2. **Use the verified fallback image.** The exact published digest in [current steps](NEXT_STEPS.md) passed anonymous pull/run verification.
 3. **Use the verified public API.** Render Free is deployed with Terra/none and cache 128. The key is supplied through Render environment secrets. Public uncached evaluation passed 30/30; see [hosted evidence](public-verification.json).
-4. **Check availability before judging.** Test from another network. Render Free sleeps after idle, which can exceed the 30-second limit; warm-instance benchmark success does not establish uninterrupted availability.
+4. **Check availability before judging.** Test from another network. Render Free sleeps after idle, which can exceed the 30-second limit; warm-instance benchmark success does not establish uninterrupted availability. [Free monitoring and backup suggestions](FREE_HOSTING.md) are documented but have not been provisioned.
 5. **Upload the video.** Submit the prepared MP4 or an organizer-accessible link. Review the [transcript](video/TRANSCRIPT.md) and ensure the team can explain the implementation.
 6. **Submit real references.** Provide the public base URL, repository, README/configuration, pullable image reference, and video. Never put a secret in a public submission field.
 
-## Video contents
+## Historical 1.0.0 video contents
 
 | Time | Show and explain |
 |---|---|
@@ -37,4 +48,4 @@ Generated files under `output/` are ignored by Git. The video and verification r
 | 1:57–2:20 | Verified Docker command and recorded local health/optimization results |
 | 2:20–2:44 | Model/cache configuration, observed latency, and deployment requirements |
 
-Times are rounded to the nearest second. The video makes no claim that a public deployment already exists. Reproduction and narration details are in [video/README.md](video/README.md). It carries no base points but is the first tie-breaker in the guide.
+Times above describe the retained earlier 2:44 video. The current candidate is 2:38 and includes cost-first/peak-second optimization and updated evidence; use its [current transcript and reproduction notes](video/README.md). Neither video carries base points; the video is the guide's first tie-breaker and must be accessible to judges.

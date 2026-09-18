@@ -1,6 +1,7 @@
 """Deterministic linear optimization. No LLM, prompts, or sample lookup here."""
 
 import math
+import time
 
 import pulp
 
@@ -31,7 +32,11 @@ def solver_ready() -> bool:
         return False
 
 
-def optimize(scenario: Scenario, directives: list[Directive], time_limit: float = 3.0) -> OptimizationResponse:
+def optimize(
+    scenario: Scenario, directives: list[Directive], time_limit: float = 3.0,
+    *, minimize_peak: bool = True,
+) -> OptimizationResponse:
+    started = time.monotonic()
     hours = sorted(scenario.hours, key=lambda x: x.hour)
     bounds = compile_constraints(scenario, directives)
     battery = scenario.battery
@@ -48,7 +53,8 @@ def optimize(scenario: Scenario, directives: list[Directive], time_limit: float 
         problem += energy[h] == before + delta[h], f"battery_transition_{h}"
         problem += grid[h] + solar[h] == hours[h].demand_kwh + delta[h], f"balance_{h}"
     problem += energy[23] == battery.initial_energy_kwh, "end_of_day_neutrality"
-    problem += pulp.lpSum(grid[h] * hours[h].tariff_bdt_per_kwh for h in range(24))
+    cost = pulp.lpSum(grid[h] * hours[h].tariff_bdt_per_kwh for h in range(24))
+    problem += cost
     try:
         problem.solve(make_solver(time_limit))
     except (pulp.PulpError, OSError) as exc:
@@ -57,6 +63,39 @@ def optimize(scenario: Scenario, directives: list[Directive], time_limit: float 
         raise InfeasibleError()
     if problem.status != pulp.LpStatusOptimal or problem.sol_status != pulp.LpSolutionOptimal:
         raise SolverError()
+
+    # Lexicographic optimization: keep the proven minimum electricity cost fixed,
+    # then reduce peak import among equally cheap schedules. A weighted peak
+    # penalty would trade away the judge's primary objective and is not used.
+    peak_refined = False
+    remaining = time_limit - (time.monotonic() - started)
+    if minimize_peak and remaining > 0.05:
+        original = [(v, v.value()) for v in problem.variables()]
+        optimal_cost = pulp.value(cost)
+        original_peak = max(v.value() for v in grid)
+        peak = pulp.LpVariable("peak_import", lowBound=0)
+        problem += cost == optimal_cost, "preserve_optimal_cost"
+        for h in range(24):
+            problem += grid[h] <= peak, f"peak_import_{h}"
+        problem.setObjective(peak)
+        try:
+            problem.solve(make_solver(remaining))
+            refined_cost = pulp.value(cost)
+            refined_peak = max(v.value() for v in grid)
+            peak_refined = (
+                problem.status == pulp.LpStatusOptimal
+                and problem.sol_status == pulp.LpSolutionOptimal
+                and refined_cost is not None and math.isfinite(refined_cost)
+                and abs(refined_cost - optimal_cost) <= 0.001
+                and refined_peak <= original_peak + 1e-7
+            )
+        except (pulp.PulpError, OSError, TypeError, ValueError):
+            peak_refined = False
+        if not peak_refined:
+            # Secondary improvement is optional. Its timeout or numerical failure
+            # must not discard the already established primary optimum.
+            for variable, original_value in original:
+                variable.varValue = original_value
 
     def value(variable):
         result = variable.value()
@@ -91,11 +130,13 @@ def optimize(scenario: Scenario, directives: list[Directive], time_limit: float 
     total_grid = math.fsum(p.grid_kwh for p in plan)
     total_cost = math.fsum(p.grid_kwh * hours[p.hour].tariff_bdt_per_kwh for p in plan)
     applied = sum(d.applies for d in directives)
+    peak_description = " Selected a minimum-peak schedule at the same cost." if peak_refined else ""
     return OptimizationResponse(
         scenario_id=scenario.scenario_id, directive_interpretation=directives, hourly_plan=plan,
         total_grid_kwh=total_grid, total_cost_bdt=total_cost,
         peak_grid_kwh=max(p.grid_kwh for p in plan),
         plan_summary=(f"Applied {applied} operating directive(s). Minimized grid cost to "
                       f"{total_cost:.2f} BDT using available solar and tariff-based battery scheduling; "
-                      f"restored the battery to {battery.initial_energy_kwh:g} kWh at day end."),
+                      f"restored the battery to {battery.initial_energy_kwh:g} kWh at day end."
+                      f"{peak_description}"),
     )

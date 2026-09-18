@@ -70,3 +70,7 @@ Every computed schedule also passed independent replay under the official interp
 - The latest GitHub metadata reports the repository is now private, created at 2026-09-18T13:13:45Z. The question-reveal/deadline times were not supplied, so event timing compliance cannot be determined. The connected account cannot change repository visibility.
 
 Reproduce locally with the README commands. Generated detailed reports are in ignored `output/`; they are evidence from individual runs, not official judge results. Update this file after live/container/deployment verification rather than treating planned checks as completed.
+
+## 1.0.1 audit candidate
+
+243 Windows and Linux tests passed, plus 30/30 real uncached Terra/low container requests (p95 2.673 s), 10/10 real concurrent official requests, and 56/56 language checks for each of three model/effort candidates. The exact 1.0.1 image was anonymously pulled and executed. The updated 2:38 candidate video was visually checked and fully decoded. These results are distinct from the hosted 1.0.0 measurements above; see [audit-verification.json](audit-verification.json).
