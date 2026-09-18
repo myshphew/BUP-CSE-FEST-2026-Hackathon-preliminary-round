@@ -1,0 +1,310 @@
+{
+  "mode": "http_full_pipeline",
+  "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+  "passed": 30,
+  "total": 30,
+  "p95_seconds": 2.641738,
+  "max_seconds": 3.379812,
+  "results": [
+    {
+      "case_id": "SAMPLE-01",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38365.0,
+      "reference_cost_bdt": 38365,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.240769
+    },
+    {
+      "case_id": "SAMPLE-02",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 42885.0,
+      "reference_cost_bdt": 42885,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.264307
+    },
+    {
+      "case_id": "SAMPLE-03",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 35480.0,
+      "reference_cost_bdt": 35480,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.736005
+    },
+    {
+      "case_id": "SAMPLE-04",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 40495.0,
+      "reference_cost_bdt": 40495,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.545003
+    },
+    {
+      "case_id": "SAMPLE-05",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 33950.0,
+      "reference_cost_bdt": 33950,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.672833
+    },
+    {
+      "case_id": "SAMPLE-06",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34090.0,
+      "reference_cost_bdt": 34090,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 3.379812
+    },
+    {
+      "case_id": "SAMPLE-07",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38550.0,
+      "reference_cost_bdt": 38550,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.283765
+    },
+    {
+      "case_id": "SAMPLE-08",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 37665.0,
+      "reference_cost_bdt": 37665,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.44399
+    },
+    {
+      "case_id": "SAMPLE-09",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34873.0,
+      "reference_cost_bdt": 34873,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.807881
+    },
+    {
+      "case_id": "SAMPLE-10",
+      "repetition": 1,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 41620.0,
+      "reference_cost_bdt": 41620,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.581843
+    },
+    {
+      "case_id": "SAMPLE-01",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38365.0,
+      "reference_cost_bdt": 38365,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.178958
+    },
+    {
+      "case_id": "SAMPLE-02",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 42885.0,
+      "reference_cost_bdt": 42885,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.479489
+    },
+    {
+      "case_id": "SAMPLE-03",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 35480.0,
+      "reference_cost_bdt": 35480,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.641738
+    },
+    {
+      "case_id": "SAMPLE-04",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 40495.0,
+      "reference_cost_bdt": 40495,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.745865
+    },
+    {
+      "case_id": "SAMPLE-05",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 33950.0,
+      "reference_cost_bdt": 33950,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.384281
+    },
+    {
+      "case_id": "SAMPLE-06",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34090.0,
+      "reference_cost_bdt": 34090,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.903716
+    },
+    {
+      "case_id": "SAMPLE-07",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38550.0,
+      "reference_cost_bdt": 38550,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.898845
+    },
+    {
+      "case_id": "SAMPLE-08",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 37665.0,
+      "reference_cost_bdt": 37665,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.652413
+    },
+    {
+      "case_id": "SAMPLE-09",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34873.0,
+      "reference_cost_bdt": 34873,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.825384
+    },
+    {
+      "case_id": "SAMPLE-10",
+      "repetition": 2,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 41620.0,
+      "reference_cost_bdt": 41620,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.141601
+    },
+    {
+      "case_id": "SAMPLE-01",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38365.0,
+      "reference_cost_bdt": 38365,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.596589
+    },
+    {
+      "case_id": "SAMPLE-02",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 42885.0,
+      "reference_cost_bdt": 42885,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.92623
+    },
+    {
+      "case_id": "SAMPLE-03",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 35480.0,
+      "reference_cost_bdt": 35480,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.770232
+    },
+    {
+      "case_id": "SAMPLE-04",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 40495.0,
+      "reference_cost_bdt": 40495,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.264929
+    },
+    {
+      "case_id": "SAMPLE-05",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 33950.0,
+      "reference_cost_bdt": 33950,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.560214
+    },
+    {
+      "case_id": "SAMPLE-06",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34090.0,
+      "reference_cost_bdt": 34090,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.169744
+    },
+    {
+      "case_id": "SAMPLE-07",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 38550.0,
+      "reference_cost_bdt": 38550,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.779162
+    },
+    {
+      "case_id": "SAMPLE-08",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 37665.0,
+      "reference_cost_bdt": 37665,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.586008
+    },
+    {
+      "case_id": "SAMPLE-09",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 34873.0,
+      "reference_cost_bdt": 34873,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 1.503336
+    },
+    {
+      "case_id": "SAMPLE-10",
+      "repetition": 3,
+      "passed": true,
+      "interpretation_matches": true,
+      "cost_bdt": 41620.0,
+      "reference_cost_bdt": 41620,
+      "cost_difference_bdt": 0.0,
+      "elapsed_seconds": 2.177783
+    }
+  ]
+}

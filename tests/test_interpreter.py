@@ -93,7 +93,7 @@ def test_invalid_provider_response_fails_and_is_not_cached(case, scenario, mode)
 
 
 @pytest.mark.parametrize("status", [401, 404, 429, 500, 503])
-def test_provider_http_errors_are_not_no_op(scenario, status):
+def test_provider_http_errors_are_not_no_op(scenario, status, caplog):
     calls = []
     def handler(request):
         calls.append(request)
@@ -107,6 +107,32 @@ def test_provider_http_errors_are_not_no_op(scenario, status):
         finally:
             await interpreter.close()
     asyncio.run(run())
+    assert f"model_request_failed status={status}" in caplog.text
+    assert "DO_NOT_ECHO" not in caplog.text
+    assert "test-only-placeholder" not in caplog.text
+
+
+@pytest.mark.parametrize("code,category", [
+    ("insufficient_quota", "quota_exhausted"),
+    ("rate_limit_exceeded", "rate_limited"),
+    ("PRIVATE_PROVIDER_TEXT", "rate_limited"),
+])
+def test_provider_log_categories_never_echo_untrusted_error_fields(scenario, caplog, code, category):
+    def handler(request):
+        return httpx.Response(429, json={"error": {
+            "message": "PRIVATE_PROVIDER_TEXT", "type": "PRIVATE_PROVIDER_TEXT", "code": code,
+        }})
+    async def run():
+        interpreter = make_interpreter(handler)
+        try:
+            with pytest.raises(ProviderError):
+                await interpreter.interpret(scenario)
+        finally:
+            await interpreter.close()
+    asyncio.run(run())
+    assert f"model_request_failed status=429 category={category}" in caplog.text
+    assert "PRIVATE_PROVIDER_TEXT" not in caplog.text
+    assert "test-only-placeholder" not in caplog.text
 
 
 def test_provider_timeout_is_controlled(scenario):

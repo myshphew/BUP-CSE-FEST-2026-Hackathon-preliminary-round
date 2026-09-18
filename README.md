@@ -2,7 +2,17 @@
 
 A FastAPI service for the **BUP CSE Fest 2026 Smart Campus Energy Optimization Challenge**. The configured OpenAI model interprets operator notes, deterministic guardrails validate the result, PuLP/CBC minimizes 24-hour grid cost, and an independent validator replays the final schedule before it is returned.
 
-**Verification status:** 165 tests passed inside Linux Docker; all 10 official sample optimal costs match. Real OpenAI requests through the container passed **30/30 with caching disabled, p95 3.667 seconds**. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. A narrated 2:44 solution video and an exported Docker image are prepared locally. Public hosting and registry publication still need account selection/access. See [verification evidence](docs/VERIFICATION.md), [measured model performance](docs/PERFORMANCE.md), and [remaining deployment steps](docs/DEPLOYMENT.md). These results are not a claimed hidden-judge score.
+**Verification status:** 165 tests passed inside Linux Docker; all 10 official sample optimal costs match. Real OpenAI requests through the container passed **30/30 with caching disabled, p95 3.667 seconds**. Astra and Terra also passed 15/15 supplemental paraphrase/adversarial checks each. A narrated 2:44 solution video and an exported Docker image are prepared locally. The GHCR image is anonymously pullable. The public Render API passed **30/30 uncached official requests, p95 2.642 seconds, maximum 3.380 seconds**. See [current next steps](docs/NEXT_STEPS.md). See [verification evidence](docs/VERIFICATION.md), [measured model performance](docs/PERFORMANCE.md), and [remaining deployment steps](docs/DEPLOYMENT.md). These results are not a claimed hidden-judge score.
+
+## Public service
+
+Base URL: https://bup-cse-preliminary-round-1-0-0.onrender.com
+
+- [Health](https://bup-cse-preliminary-round-1-0-0.onrender.com/health)
+- [Interactive API documentation](https://bup-cse-preliminary-round-1-0-0.onrender.com/docs)
+- Optimization: `POST /optimize-energy` with an official case input
+
+The service uses Terra/none; normal interpretation cache size is 128. No authentication is required for the judge endpoints. The existing 1.0.0 image remains the tested deployment; later diagnostic logging changes are tracked separately.
 
 ## Official sources and API permission
 
@@ -190,11 +200,11 @@ docker pull ghcr.io/YOUR_NAMESPACE/bup-cse-preliminary-round:1.0.0
 docker run --rm -p 8000:8000 --env-file .env ghcr.io/YOUR_NAMESPACE/bup-cse-preliminary-round:1.0.0
 ```
 
-The optional **Publish tested Docker image** GitHub Actions workflow publishes to GHCR using GitHub's job token after tests, offline container verification, and a readiness check pass. It records the exact digest and verifies an authenticated registry pull. The package owner must separately enable and verify anonymous pulls for judges. See [the publication runbook](docs/DEPLOYMENT.md); this workflow has been prepared, but has not been pushed or run.
+The optional **Publish tested Docker image** GitHub Actions workflow publishes to GHCR using GitHub's job token after tests, offline container verification, and a readiness check pass. It records the exact digest and verifies an authenticated registry pull. The package owner must separately enable and verify anonymous pulls for judges. See [the publication runbook](docs/DEPLOYMENT.md); this workflow was pushed and [ran successfully](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35364973349). Anonymous pulls and execution of the published digest have passed.
 
 Deploy the same image on a publicly reachable platform with `OPENAI_API_KEY` supplied through its secret manager. Keep both judge endpoints accessible without a login, VPN, or manual action. Verify both endpoints **from outside the development machine** and keep the service and image available throughout evaluation. The existing [GitHub CI run for commit c9f0040 passed](https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35361197350).
 
-The guide also requires repository visibility/timing rules and a maximum three-minute solution video. See [the submission checklist](docs/SUBMISSION.md) and [video transcript/reproduction notes](docs/video/README.md). The local video is `output/submission/gridwise-solution.mp4`; the image archive is `output/submission/gridwise-1.0.0.tar`, with SHA-256 checksums beside them. These generated artifacts are intentionally outside Git. No image has been published and no public service has been deployed from this workspace.
+The guide also requires repository visibility/timing rules and a maximum three-minute solution video. See [the submission checklist](docs/SUBMISSION.md) and [video transcript/reproduction notes](docs/video/README.md). The local video is `output/submission/gridwise-solution.mp4`; the image archive is `output/submission/gridwise-1.0.0.tar`, with SHA-256 checksums beside them. These generated artifacts are intentionally outside Git. The GHCR image is published, and the video is uploaded to a private draft release. The public API and anonymous image access are verified; final organizer submission and public repository/video access remain. See [current next steps](docs/NEXT_STEPS.md).
 
 ## Dependencies, attribution, and limitations
 
@@ -204,5 +214,5 @@ Python; FastAPI/Starlette; Uvicorn; Pydantic; the OpenAI Python SDK and Response
 - Deterministic guardrails verify shapes and numeric/physical consistency. They cannot prove that a valid-looking interpretation matches the natural-language intent. That requires live language evaluation against expected semantics.
 - LLM behavior and provider latency are not deterministic. The scheduling calculation is deterministic for the same validated inputs and pinned runtime. Equivalent optimal schedules can differ across solver versions/platforms.
 - Missing keys, inaccessible models, insufficient quota, or invalid model outputs fail safely; there is no heuristic interpreter fallback. A correct but slow/unavailable provider can still lose rubric points.
-- Live-model accuracy, Docker/Linux execution, and local p95 have been verified for the documented cases. Public deployment, registry publication, video submission, unseen-language accuracy, and deployed p95 still require verification or external action.
+- The public API passed all 30 uncached official requests; see [hosted verification](docs/public-verification.json). Render Free sleeps after 15 idle minutes and can take about a minute to wake, so these warm-instance results do not guarantee cold-start availability. Final organizer submission and public repository/video access remain. Hidden-note accuracy is not established by public samples.
 - The installed test dependencies emit two upstream deprecation warnings; the test suite still passes. They concern Starlette's HTTPX test client and AnyIO's portal alias.

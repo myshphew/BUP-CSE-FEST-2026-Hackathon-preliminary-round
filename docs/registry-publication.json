@@ -1,0 +1,20 @@
+{
+  "repository": "myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round",
+  "ref": "main",
+  "tag": "1.0.0",
+  "commit": "60ec64fb7c1dc70a462cca795d4c71e712e981f0",
+  "dispatched_at": "2026-09-18T15:51:02.663420+00:00",
+  "workflow_run_id": 35364973349,
+  "workflow_url": "https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35364973349",
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "image_tag": "ghcr.io/myshphew/bup-cse-preliminary-round:1.0.0",
+  "image_digest_reference": "ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f",
+  "repository_private": true,
+  "anonymous_pull_passed": true,
+  "anonymous_pull_checked_at": "2026-09-18T16:15:44.137854+00:00",
+  "published_image_offline_exit_code": 0,
+  "published_image_health_status": 200,
+  "published_image_live_smoke_passed": true,
+  "port_10000_verified": true
+}

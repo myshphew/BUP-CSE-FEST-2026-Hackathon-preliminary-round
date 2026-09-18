@@ -1,0 +1,24 @@
+# Optional Render Blueprint. No service is created by saving this file.
+# Free services sleep after 15 idle minutes; cold-start latency is unverified.
+# This exact image has passed an anonymous pull and execution checks.
+# Applying this template creates a separate service; the existing service is in Oregon.
+services:
+  - type: web
+    name: gridwise-bup-cse
+    runtime: image
+    plan: free
+    region: singapore
+    image:
+      url: ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6-terra
+      - key: OPENAI_REASONING_EFFORT
+        value: none
+      - key: INTERPRETATION_CACHE_SIZE
+        value: "0"
+      - key: PORT
+        value: "10000"

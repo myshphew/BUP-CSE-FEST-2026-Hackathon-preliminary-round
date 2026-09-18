@@ -1,0 +1,76 @@
+{
+  "verified_at": "2026-09-18T16:37:37.261852+00:00",
+  "base_url": "https://bup-cse-preliminary-round-1-0-0.onrender.com",
+  "provider": "Render",
+  "plan": "Free",
+  "region": "Oregon",
+  "port": 10000,
+  "deployed_image": "ghcr.io/myshphew/bup-cse-preliminary-round@sha256:262f30a45145c18310a61c34d4f7483b81dd7bb7293d81045938707c06b1d20f",
+  "deployed_source_commit": "60ec64fb7c1dc70a462cca795d4c71e712e981f0",
+  "deploy_id_uncached": "dep-dammf20u01pc73aqqlh0",
+  "deploy_id_cache_128": "dep-dammgd942hec739mn3t0",
+  "model": "gpt-5.6-terra",
+  "reasoning_effort": "none",
+  "normal_cache_size": 128,
+  "uncached_benchmark": {
+    "mode": "http_full_pipeline",
+    "official_sample_sha256": "fa6abd71868e0faf429a87429d7d4a2b7bfd38c5551565637498d7fec68d5f32",
+    "passed": 30,
+    "total": 30,
+    "p95_seconds": 2.641738,
+    "max_seconds": 3.379812
+  },
+  "benchmark_application_cache_size": 0,
+  "first_post_key_deploy_smoke": {
+    "case_id": "SAMPLE-01",
+    "repetition": 1,
+    "passed": true,
+    "interpretation_matches": true,
+    "cost_bdt": 38365.0,
+    "reference_cost_bdt": 38365,
+    "cost_difference_bdt": 0.0,
+    "elapsed_seconds": 8.596425
+  },
+  "final_checks": {
+    "verified_at": "2026-09-18T16:36:10.952044+00:00",
+    "base_url": "https://bup-cse-preliminary-round-1-0-0.onrender.com",
+    "cache_size": 128,
+    "sample_requests": [
+      {
+        "attempt": 1,
+        "passed": true,
+        "elapsed_seconds": 8.388281,
+        "cost_bdt": 38365.0
+      },
+      {
+        "attempt": 2,
+        "passed": true,
+        "elapsed_seconds": 0.350934,
+        "cost_bdt": 38365.0
+      }
+    ],
+    "invalid_input_checks": {
+      "malformed_json": 400,
+      "missing_hour": 400,
+      "unknown_field": 400
+    },
+    "health_status": 200,
+    "api_docs_status": 200
+  },
+  "anonymous_image_pull_verified": true,
+  "official_sample_unmodified": true,
+  "limitations": [
+    "Warm-instance measurements; Render Free sleeps after 15 idle minutes and takes about one minute to wake.",
+    "Requests originated on the development computer over the public internet; a separate independent client network was not verified.",
+    "Finite official samples do not establish hidden-case correctness or future provider availability."
+  ],
+  "repository_private": true,
+  "video_release_draft": true,
+  "organizer_submission_completed": false,
+  "code_diagnostics": {
+    "commit": "c18ed33c187bf8dd492c8b10f7a432595caccb42",
+    "tests_passed": 168,
+    "included_in_deployed_image": false,
+    "ci_url": "https://github.com/myshphew/BUP-CSE-FEST-2026-Hackathon-preliminary-round/actions/runs/35368634227"
+  }
+}
